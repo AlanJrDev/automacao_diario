@@ -51,7 +51,7 @@ export default function App() {
     setResult(null);
     setSyncStatus({ status: 'idle', message: '' });
 
-    const apiKey = ""; // A chave é injetada automaticamente pelo ambiente
+    const apiKey = "AIzaSyBZ8N6BiTrkQxNiVozrmCXjF7069ifWQPQ";
     const currentDate = new Date().toLocaleDateString('pt-BR', { 
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
     });
