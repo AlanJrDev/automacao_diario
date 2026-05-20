@@ -67,7 +67,8 @@ export default function App() {
       1. Deduza a data exata com base no relato e na data de hoje. 
       2. Extraia o conteúdo lecionado.
       3. Identifique os nomes ou primeiros nomes dos alunos que faltaram e dos que estiveram presentes (se mencionados). Se disser que "ninguém faltou" ou "todos vieram", deixe a lista de faltas vazia.
-      4. Devolva APENAS um objeto JSON válido, sem markdown ou explicações. A estrutura DEVE ser exatamente: {"curso": "nome", "turno": "Manhã", "data_aula": "2024-05-20", "conteudo_lecionado": "...", "nomes_faltas": [], "nomes_presencas": [], "observacoes": ""}
+      4. Devolva APENAS um objeto JSON válido, sem markdown ou explicações. A estrutura DEVE ser exatamente: {"curso": "nome", "turno": "Manhã", "data_aula": "5/14/2026", "conteudo_lecionado": "...", "nomes_faltas": [], "nomes_presencas": [], "observacoes": ""}
+      ATENÇÃO CRÍTICA PARA A DATA: A propriedade "data_aula" DEVE ser obrigatoriamente no formato M/D/YYYY (Mês/Dia/Ano) sem zero à esquerda. Exemplo: 14 de Maio de 2026 deve ser "5/14/2026". 4 de Junho de 2026 deve ser "6/4/2026".
     `;
 
     const userQuery = `Data de hoje (contexto): ${currentDate} (${isoDate}).\nRelato do professor: "${prompt}"`;
