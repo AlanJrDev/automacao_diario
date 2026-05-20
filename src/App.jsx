@@ -124,9 +124,8 @@ export default function App() {
             setSyncStatus({ status: 'error', message: `Erro no Sheets: ${syncJson.message}` });
           }
         } catch (e) {
-           // Em caso de falha de leitura (CORS opaco) mas envio feito
-           console.log("Aviso de rede (CORS normal no Apps Script): ", e);
-           setSyncStatus({ status: 'success', message: 'Dados enviados para o Google Sheets com sucesso!' });
+           console.log("Erro de rede ao conectar com Apps Script: ", e);
+           setSyncStatus({ status: 'error', message: 'Erro de comunicação com o Google. A data solicitada provavelmente não existe na planilha ou o script falhou silenciosamente.' });
         }
       } else {
          setSyncStatus({ status: 'error', message: 'Aviso: O URL do Backend (Apps Script) não foi configurado no código-fonte.' });
