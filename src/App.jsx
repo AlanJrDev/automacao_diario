@@ -15,8 +15,8 @@ export default function App() {
   const [error, setError] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // ⚠️ IMPORTANTE: URL do Deploy do Google Apps Script
-  const googleAppsScriptURL = import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL || "https://script.google.com/macros/s/AKfycbyVE38v7r0kREtjzydXasosO5mEWEQo8p6SZ_soS82iHxFstRJ0nE_R0Ra2zyPWAmnS1w/exec";
+  // ⚠️ IMPORTANTE: URL do Deploy do Google Apps Script (Forçado via código para evitar conflito com Vercel)
+  const googleAppsScriptURL = "https://script.google.com/macros/s/AKfycbyVE38v7r0kREtjzydXasosO5mEWEQo8p6SZ_soS82iHxFstRJ0nE_R0Ra2zyPWAmnS1w/exec";
 
   useEffect(() => {
     if (window.innerWidth < 768) setIsSidebarOpen(false);
