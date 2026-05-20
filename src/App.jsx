@@ -16,7 +16,7 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // ⚠️ IMPORTANTE: URL do Deploy do Google Apps Script
-  const googleAppsScriptURL = "https://script.google.com/macros/s/AKfycbwmg2KC3ME3Z9UsolRdLrvAg9WyO2Fl7v44vN3pu96PVI7f7K0Oba4q9FNvDvekqGH3Nw/exec"; 
+  const googleAppsScriptURL = import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL || "https://script.google.com/macros/s/AKfycbwmg2KC3ME3Z9UsolRdLrvAg9WyO2Fl7v44vN3pu96PVI7f7K0Oba4q9FNvDvekqGH3Nw/exec";
 
   useEffect(() => {
     if (window.innerWidth < 768) setIsSidebarOpen(false);
@@ -51,7 +51,7 @@ export default function App() {
     setResult(null);
     setSyncStatus({ status: 'idle', message: '' });
 
-    const apiKey = "AIzaSyBZ8N6BiTrkQxNiVozrmCXjF7069ifWQPQ";
+    const apiKey = import.meta.env.VITE_GROQ_API_KEY || "";
     const currentDate = new Date().toLocaleDateString('pt-BR', { 
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
     });
@@ -67,40 +67,36 @@ export default function App() {
       1. Deduza a data exata com base no relato e na data de hoje. 
       2. Extraia o conteúdo lecionado.
       3. Identifique os nomes ou primeiros nomes dos alunos que faltaram e dos que estiveram presentes (se mencionados). Se disser que "ninguém faltou" ou "todos vieram", deixe a lista de faltas vazia.
-      4. Devolva APENAS um objeto JSON válido.
+      4. Devolva APENAS um objeto JSON válido, sem markdown ou explicações. A estrutura DEVE ser exatamente: {"curso": "nome", "turno": "Manhã", "data_aula": "2024-05-20", "conteudo_lecionado": "...", "nomes_faltas": [], "nomes_presencas": [], "observacoes": ""}
     `;
 
     const userQuery = `Data de hoje (contexto): ${currentDate} (${isoDate}).\nRelato do professor: "${prompt}"`;
 
     const payload = {
-      contents: [{ parts: [{ text: userQuery }] }],
-      systemInstruction: { parts: [{ text: systemInstruction }] },
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "OBJECT",
-          properties: {
-            curso: { type: "STRING", description: "Nome do curso identificado" },
-            turno: { type: "STRING", description: "Manhã ou Tarde" },
-            data_aula: { type: "STRING", description: "Data da aula no formato YYYY-MM-DD" },
-            conteudo_lecionado: { type: "STRING", description: "Resumo do conteúdo lecionado" },
-            nomes_faltas: { type: "ARRAY", items: { type: "STRING" }, description: "Nomes dos alunos que faltaram" },
-            nomes_presencas: { type: "ARRAY", items: { type: "STRING" }, description: "Nomes dos alunos que estiveram presentes" },
-            observacoes: { type: "STRING", description: "Qualquer outra observação" }
-          },
-          required: ["curso", "turno", "data_aula", "conteudo_lecionado", "nomes_faltas"]
-        }
-      }
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: systemInstruction },
+        { role: "user", content: userQuery }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.1
     };
 
     try {
-      // 1. Extração via IA (Gemini)
+      // 1. Extração via IA (Groq)
       const data = await fetchWithRetry(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }
+        `https://api.groq.com/openai/v1/chat/completions`,
+        { 
+          method: 'POST', 
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          }, 
+          body: JSON.stringify(payload) 
+        }
       );
 
-      const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const jsonText = data.choices?.[0]?.message?.content;
       if (!jsonText) throw new Error("A resposta da IA não continha dados válidos.");
       
       const extractedData = JSON.parse(jsonText);
@@ -162,8 +158,8 @@ export default function App() {
         <div className="w-72 flex flex-col h-full">
           <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-600 p-1.5 rounded-lg"><Sparkles className="w-5 h-5 text-white" /></div>
-              <span className="font-bold text-lg text-white tracking-wide">GAMA AI</span>
+              <div className="bg-purple-600 p-1.5 rounded-lg shadow-lg shadow-purple-500/30"><Sparkles className="w-5 h-5 text-white" /></div>
+              <span className="font-bold text-lg text-white tracking-wide">Dario.IA</span>
             </div>
             <button className="md:hidden p-1 hover:bg-slate-800 rounded-md text-slate-400" onClick={() => setIsSidebarOpen(false)}>
               <X className="w-5 h-5" />
@@ -316,10 +312,12 @@ export default function App() {
         </main>
         
         {/* Banner by Alan */}
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none drop-shadow-lg">
-          <img src="/banner.svg" alt="Banner" className="h-14 md:h-16 w-auto mb-1.5 opacity-90 transition-opacity hover:opacity-100" />
-          <div className="bg-white/80 backdrop-blur-md px-3 py-1 rounded-full border border-slate-200/50 shadow-sm">
-            <span className="text-xs font-bold text-slate-700 tracking-wide">by Alan</span>
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-2 pointer-events-none">
+          <div className="bg-slate-900 p-1.5 rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden transform hover:scale-105 transition-all">
+            <img src="/banner.svg" alt="Banner" className="h-12 w-12 object-cover rounded-xl" />
+          </div>
+          <div className="bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-slate-200 shadow-xl shadow-slate-200/50">
+            <span className="text-[10px] font-black text-slate-800 tracking-widest uppercase">BY ALAN</span>
           </div>
         </div>
 
