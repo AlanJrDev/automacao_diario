@@ -8,7 +8,7 @@ import {
 export default function App() {
   const [prompt, setPrompt] = useState('');
   // Utilizando o ID da sua planilha "MINHAS_ALUNAS_MAT" como padrão
-  const [planilhaId, setPlanilhaId] = useState('1GabveOV1esfKRKpxoXADr7_4-idWW1w'); 
+  const [planilhaId, setPlanilhaId] = useState('13wot0sKShqyRg6NVxnYBahWIFOzA7SNgoeNozITZaB0'); 
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [syncStatus, setSyncStatus] = useState({ status: 'idle', message: '' }); 
