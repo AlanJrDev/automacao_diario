@@ -12,7 +12,7 @@ import {
   ChevronRight, Zap, Mail, Plus, Info, Bot, Activity,
   TrendingDown, MapPin, User, Phone, Hash, ChevronDown,
   RefreshCw, Brain, Eye, AlertTriangle, Share2, GraduationCap, MoreVertical,
-  Bell, Settings
+  Bell, Settings, Download, UserPlus
 } from 'lucide-react';
 import './index.css';
 
@@ -179,7 +179,7 @@ export const GlobalChatbot = ({ isOpen, onClose, isMobile }) => {
 
   return (
     <>
-      {isOpen && isMobile && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:99 }} onClick={onClose} />}
+      {isOpen && isMobile && <div className="sidebar-overlay" style={{ zIndex:99 }} onClick={onClose} />}
       <div className={`chatbot-sidebar ${isOpen ? 'open' : ''}`}>
         <div style={{ padding: '20px', borderBottom: '1px solid rgba(139,92,246,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background:'rgba(139,92,246,0.04)' }}>
           <div style={{ display:'flex', alignItems:'center', gap:12 }}>
@@ -329,7 +329,7 @@ function DiarioScreen({ userEmail }) {
   };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0 }}>
+    <main ref={containerRef} className="flex-1 p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0, overflowY:'auto' }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }} className="space-y-6">
         <div className="animate-assemble">
           <h2 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize: '1.875rem', fontWeight: 800, background: 'linear-gradient(135deg, #c4b5fd 0%, #ffffff 60%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>Lançamento Inteligente</h2>
@@ -337,12 +337,11 @@ function DiarioScreen({ userEmail }) {
         </div>
 
         {/* Planilha ID */}
-        <div className="cyber-card animate-assemble" style={{ padding:16, display:'flex', alignItems:'center', gap:12 }}>
-          <Database style={{ width:18, height:18, color:'#a78bfa', flexShrink:0 }} />
-          <span style={{ color:'rgba(148,163,184,0.7)', fontWeight:500, whiteSpace:'nowrap', fontSize:13 }}>ID da Planilha</span>
+        <div className="cyber-card animate-assemble" style={{ padding:'10px 16px', display:'flex', alignItems:'center', gap:10 }}>
+          <Database style={{ width:16, height:16, color:'#a78bfa', flexShrink:0 }} />
           <input type="text" value={planilhaId} onChange={e => setPlanilhaId(e.target.value)}
-            placeholder="Insira o ID do Google Sheets..."
-            style={{ flex:1, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(139,92,246,0.25)', borderRadius:10, padding:'8px 14px', color:'#e2e8f0', fontFamily:'monospace', fontSize:13, outline:'none' }}
+            placeholder="ID da Planilha Google Sheets..."
+            style={{ flex:1, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(139,92,246,0.25)', borderRadius:8, padding:'6px 12px', color:'#e2e8f0', fontFamily:'monospace', fontSize:12, outline:'none' }}
             className="cyber-input" />
         </div>
 
@@ -397,13 +396,13 @@ function DiarioScreen({ userEmail }) {
               </div>
             )}
             <div className="cyber-card" style={{ padding:32 }}>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:16, marginBottom:24 }}>
-                {[
-                  { icon: BookOpen, bg:'rgba(139,92,246,0.15)', ic:'#c4b5fd', label:'Curso', val: result.curso },
-                  { icon: Calendar, bg:'rgba(234,179,8,0.15)', ic:'#fbbf24', label:'Data e Turno', val: `${result.data_aula} (${result.turno})` },
-                  { icon: UserMinus, bg:'rgba(239,68,68,0.15)', ic:'#f87171', label:'Faltas', val: result.nomes_faltas?.length > 0 ? result.nomes_faltas.join(', ') : 'Todos Presentes', span: 2 },
-                ].map(({ icon: Icon, bg, ic, label, val, span }) => (
-                  <div key={label} style={{ background:'rgba(255,255,255,0.02)', padding:20, borderRadius:16, border:'1px solid rgba(139,92,246,0.15)', display:'flex', alignItems:'flex-start', gap:14, gridColumn: span ? `span ${span}` : 'auto' }}>
+            <div className="grid-responsive" style={{ marginBottom:24 }}>
+              {[
+                { icon: BookOpen, bg:'rgba(139,92,246,0.15)', ic:'#c4b5fd', label:'Curso', val: result.curso },
+                { icon: Calendar, bg:'rgba(234,179,8,0.15)', ic:'#fbbf24', label:'Data e Turno', val: `${result.data_aula} (${result.turno})` },
+                { icon: UserMinus, bg:'rgba(239,68,68,0.15)', ic:'#f87171', label:'Faltas', val: result.nomes_faltas?.length > 0 ? result.nomes_faltas.join(', ') : 'Todos Presentes' },
+              ].map(({ icon: Icon, bg, ic, label, val }) => (
+                <div key={label} style={{ background:'rgba(255,255,255,0.02)', padding:20, borderRadius:16, border:'1px solid rgba(139,92,246,0.15)', display:'flex', alignItems:'flex-start', gap:14 }}>
                     <div style={{ background:bg, padding:10, borderRadius:12, flexShrink:0 }}><Icon style={{ width:22, height:22, color:ic }}/></div>
                     <div><p style={{ fontSize:11, color:'rgba(148,163,184,0.5)', fontWeight:700, textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>{label}</p><p style={{ fontSize:16, fontWeight:700, color:'#e2e8f0' }}>{val}</p></div>
                   </div>
@@ -418,7 +417,7 @@ function DiarioScreen({ userEmail }) {
         )}
 
         {/* Feature Cards Section (underneath) */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))', gap:16, marginTop:24 }} className="animate-assemble">
+        <div className="grid-responsive animate-assemble" style={{ marginTop:24 }}>
           {[
             { icon: UserMinus, title: 'Detecção de Faltas', desc: 'A IA identifica nomes e registra ausências automaticamente no sistema.' },
             { icon: BookOpen, title: 'Resumo de Conteúdo', desc: 'Sua descrição é convertida em tópicos formais para o diário de classe.' },
@@ -537,7 +536,7 @@ Período: 01/05/2026 a 31/05/2026`);
   };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0 }}>
+    <main ref={containerRef} className="flex-1 p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0, overflowY:'auto' }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }} className="space-y-6">
         
         {/* Header */}
@@ -585,9 +584,14 @@ Período: 01/05/2026 a 31/05/2026`);
             disabled={isLoading} />
             
           <div style={{ background:'rgba(255,255,255,0.02)', padding:'12px 24px', display:'flex', justifyContent:'space-between', alignItems:'center', borderTop:'1px solid rgba(139,92,246,0.15)', flexWrap:'wrap', gap:12 }}>
-            <span style={{ fontSize:13, color:'rgba(148,163,184,0.5)' }}>
-              Atalho: <kbd style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(139,92,246,0.25)', padding:'2px 8px', borderRadius:6, fontFamily:'sans-serif', fontWeight:600, color:'#c4b5fd' }}>Ctrl</kbd> + <kbd style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(139,92,246,0.25)', padding:'2px 8px', borderRadius:6, fontFamily:'sans-serif', fontWeight:600, color:'#c4b5fd' }}>Enter</kbd>
-            </span>
+            <div style={{ display:'flex', alignItems:'center', gap:16, flexWrap:'wrap' }}>
+              <span style={{ fontSize:13, color:'rgba(148,163,184,0.5)' }}>
+                {prompt.trim().length} CARACTERES
+              </span>
+              <span style={{ fontSize:13, color:'rgba(148,163,184,0.5)' }}>
+                Atalho: <kbd style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(139,92,246,0.25)', padding:'2px 8px', borderRadius:6, fontFamily:'sans-serif', fontWeight:600, color:'#c4b5fd' }}>Ctrl</kbd> + <kbd style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(139,92,246,0.25)', padding:'2px 8px', borderRadius:6, fontFamily:'sans-serif', fontWeight:600, color:'#c4b5fd' }}>Enter</kbd>
+              </span>
+            </div>
             <div style={{ display:'flex', alignItems:'center', gap:12 }}>
               <button onClick={() => setPrompt('')} style={{ background:'transparent', border:'none', color:'rgba(148,163,184,0.6)', cursor:'pointer', fontSize:14, fontWeight:600, padding:'8px 16px' }}>Limpar</button>
               {isAdmin ? (
@@ -635,8 +639,8 @@ Período: 01/05/2026 a 31/05/2026`);
 // TELA: TURMAS
 // ============================================================
 
-function TurmasScreen({ userEmail }) {
-  const [activeTab, setActiveTab] = useState('lancamento');
+function TurmasScreen({ userEmail, isMobile }) {
+  const [showStudents, setShowStudents] = useState(false);
   const [selectedInstrutor, setSelectedInstrutor] = useState('');
   const [selectedCidade, setSelectedCidade] = useState('');
   
@@ -670,7 +674,7 @@ function TurmasScreen({ userEmail }) {
       { opacity: 0, y: 30, scale: 0.98 },
       { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
     );
-  }, [activeTab]);
+  }, [showStudents]);
 
   const handleForm = field => e => setFormData(prev => ({ ...prev, [field]: e.target.value }));
 
@@ -728,208 +732,47 @@ function TurmasScreen({ userEmail }) {
   const labelStyle = { fontSize:12, fontWeight:600, color:'rgba(148,163,184,0.7)', textTransform:'uppercase', letterSpacing:0.8, marginBottom:6, display:'block' };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0 }}>
+    <main ref={containerRef} className="flex-1 p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0, overflowY:'auto' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-        
+
         {/* Header */}
-        <div className="animate-assemble" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:28, flexWrap:'wrap', gap:12 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-            <div style={{ background:'linear-gradient(135deg,#8b5cf6,#7c3aed)', padding:12, borderRadius:14, boxShadow:'0 4px 16px rgba(139,92,246,0.3)' }}>
-              <Users style={{ width:24, height:24, color:'white' }}/>
+        <header className="animate-assemble" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24, paddingBottom:16, borderBottom:'1px solid rgba(139,92,246,0.1)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <div style={{ width:40, height:40, borderRadius:10, background:'rgba(139,92,246,0.15)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <Users style={{ width:22, height:22, color:'#a78bfa' }}/>
             </div>
-            <div>
-              <h2 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize:'1.875rem', fontWeight:800, background: 'linear-gradient(135deg, #c4b5fd 0%, #ffffff 60%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight:1.2 }}>Turmas</h2>
-              <p style={{ color:'rgba(148,163,184,0.7)', fontSize:14, marginTop:2 }}>Gerenciamento e cadastro de estudantes por turma.</p>
-            </div>
+            <h1 style={{ fontWeight:700, fontSize: isMobile ? 20 : 24, color:'#e2e8f0' }}>Turmas</h1>
           </div>
-          
-          <div style={{ display:'flex', gap:12 }}>
-            <button style={{ padding:'10px 24px', borderRadius:10, border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.1)', color:'#a78bfa', cursor:'pointer', fontSize:14, fontWeight:600 }}
-              onClick={() => alert('Lista exportada com sucesso!')}>
-              Exportar Lista
+          <div style={{ display:'flex', gap:8 }}>
+            <button style={{ padding:8, borderRadius:8, background:'transparent', border:'none', color:'rgba(148,163,184,0.6)', cursor:'pointer', display:'flex' }} title="Notificações">
+              <Bell style={{ width:20, height:20 }}/>
             </button>
-            <button className="btn-cyber" style={{ padding:'10px 24px', borderRadius:10, fontSize:14 }}
-              onClick={() => setActiveTab(activeTab === 'lancamento' ? 'turmas' : 'lancamento')}>
-              {activeTab === 'lancamento' ? '+ Ver Turmas' : 'Voltar ao Lançamento'}
+            <button style={{ padding:8, borderRadius:8, background:'transparent', border:'none', color:'rgba(148,163,184,0.6)', cursor:'pointer', display:'flex' }} title="Configurações">
+              <Settings style={{ width:20, height:20 }}/>
             </button>
           </div>
+        </header>
+
+        {/* Quick Actions */}
+        <div className="animate-assemble" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:24 }}>
+          <button
+            onClick={() => alert('Lista exportada com sucesso!')}
+            style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, padding:'12px 16px', borderRadius:12, background:'rgba(255,255,255,0.04)', border:'1px solid rgba(139,92,246,0.2)', color:'#e2e8f0', cursor:'pointer', fontSize:14, fontWeight:600, transition:'all 0.2s' }}>
+            <Download style={{ width:16, height:16, color:'#a78bfa' }}/>
+            Exportar
+          </button>
+          <button
+            onClick={() => setShowStudents(!showStudents)}
+            style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, padding:'12px 16px', borderRadius:12, background:'rgba(255,255,255,0.04)', border:'1px solid rgba(139,92,246,0.2)', color:'#e2e8f0', cursor:'pointer', fontSize:14, fontWeight:600, transition:'all 0.2s' }}>
+            <Eye style={{ width:16, height:16, color:'#a78bfa' }}/>
+            {showStudents ? 'Fechar Turmas' : 'Ver Turmas'}
+          </button>
         </div>
 
-        {/* Tabs navigation */}
-        <div className="animate-assemble" style={{ display:'flex', gap:8, marginBottom:28, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(139,92,246,0.15)', padding:6, borderRadius:14, width:'fit-content' }}>
-          <button className={`tab-btn ${activeTab==='lancamento'?'active':''}`} onClick={() => setActiveTab('lancamento')}>
-            <Plus style={{ width:14, height:14, display:'inline', marginRight:6 }}/>Lançamento
-          </button>
-          <button className={`tab-btn ${activeTab==='turmas'?'active':''}`} onClick={() => setActiveTab('turmas')}>
-            <Eye style={{ width:14, height:14, display:'inline', marginRight:6 }}/>Ver Turmas
-          </button>
-        </div>
-
-        {/* TAB: Lançamento */}
-        {activeTab === 'lancamento' && (
-          <div className="space-y-6">
-            
-            {/* Lançamento IA */}
-            <div className="cyber-card animate-assemble" style={{ background:'rgba(139,92,246,0.03)', border:'1px dashed rgba(139,92,246,0.3)', padding:24 }}>
-              <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
-                <Sparkles style={{ width:20, height:20, color:'#a78bfa' }}/>
-                <h4 style={{ fontSize:16, fontWeight:700, color:'#e2e8f0', margin:0 }}>Lançamento Rápido com IA</h4>
-              </div>
-              <textarea
-                placeholder="Ex: 'Adicione João Silva, 14 anos, Turma 9A de São Paulo...'"
-                value={promptIA}
-                onChange={e => setPromptIA(e.target.value)}
-                style={{ width:'100%', padding:16, borderRadius:12, border:'1px solid rgba(139,92,246,0.25)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', outline:'none', resize:'vertical', minHeight:80, fontSize:14, fontFamily:'Inter, sans-serif' }}
-              />
-              <button onClick={handleLancarIA} disabled={isLoadingIA || !promptIA.trim()} className="btn-cyber"
-                style={{ marginTop:12, display:'flex', alignItems:'center', gap:8, padding:'10px 24px', borderRadius:10, fontWeight:600, fontSize:14 }}>
-                {isLoadingIA ? <Loader2 style={{ width:16, height:16, animation:'spin 1s linear infinite' }}/> : <Zap style={{ width:16, height:16 }}/>}
-                {isLoadingIA ? 'Processando...' : 'Preencher Formulário Automaticamente'}
-              </button>
-            </div>
-
-            {/* Novo Aluno Form */}
-            <div className="cyber-card animate-assemble" style={{ padding:32 }}>
-              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
-                <h3 style={{ fontSize:18, fontWeight:700, color:'#e2e8f0', margin:0 }}>Novo Aluno Bilateral</h3>
-                <div style={{ flex:1, height:1, background:'rgba(139,92,246,0.15)', marginLeft:12 }} />
-              </div>
-              
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))', gap:20 }}>
-                <div>
-                  <label style={labelStyle}>Nome do Aluno *</label>
-                  <input type="text" value={formData.nome} onChange={handleForm('nome')} placeholder="Digite o nome completo" className="cyber-input" style={fieldStyle}/>
-                </div>
-                <div>
-                  <label style={labelStyle}>Turma</label>
-                  <select value={formData.turma} onChange={handleForm('turma')} className="cyber-select" style={{ ...fieldStyle, cursor:'pointer' }}>
-                    <option value="">Selecione uma turma...</option>
-                    <option value="9º Ano B">9º Ano B</option>
-                    <option value="1º Médio A">1º Médio A</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>Cidade / Residência</label>
-                  <input type="text" value={formData.cidade} onChange={handleForm('cidade')} placeholder="Ex: São Paulo" className="cyber-input" style={fieldStyle}/>
-                </div>
-                <div>
-                  <label style={labelStyle}>Idade</label>
-                  <input type="text" value={formData.idade} onChange={handleForm('idade')} placeholder="14" className="cyber-input" style={fieldStyle}/>
-                </div>
-                <div>
-                  <label style={labelStyle}>Nome do Tutor</label>
-                  <input type="text" value={formData.tutor} onChange={handleForm('tutor')} placeholder="Responsável legal" className="cyber-input" style={fieldStyle}/>
-                </div>
-                <div>
-                  <label style={labelStyle}>Data de Ingressão</label>
-                  <input type="date" value={formData.dataIngressao} onChange={handleForm('dataIngressao')} className="cyber-input" style={fieldStyle}/>
-                </div>
-                <div>
-                  <label style={labelStyle}>Status</label>
-                  <div style={{ display:'flex', gap:16, height:46, alignItems:'center', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(139,92,246,0.2)', borderRadius:12, padding:'0 16px' }}>
-                    <label style={{ display:'flex', alignItems:'center', gap:8, color:'#e2e8f0', fontSize:14, cursor:'pointer' }}>
-                      <input type="radio" name="status" value="Ativo" checked={formData.status === 'Ativo'} onChange={handleForm('status')} style={{ accentColor:'#8b5cf6' }} />
-                      Ativo
-                    </label>
-                    <label style={{ display:'flex', alignItems:'center', gap:8, color:'#e2e8f0', fontSize:14, cursor:'pointer' }}>
-                      <input type="radio" name="status" value="Pendente" checked={formData.status === 'Pendente'} onChange={handleForm('status')} style={{ accentColor:'#8b5cf6' }} />
-                      Pendente
-                    </label>
-                  </div>
-                </div>
-                <div style={{ gridColumn:'1/-1' }}>
-                  <label style={labelStyle}>Observações / Comentários</label>
-                  <textarea value={formData.observacoes} onChange={handleForm('observacoes')} placeholder="Informações adicionais sobre o perfil do aluno..." className="cyber-input" style={{ ...fieldStyle, minHeight:100, resize:'vertical' }}/>
-                </div>
-              </div>
-
-              {submitMsg && (
-                <div style={{ marginTop:20, padding:'14px 20px', borderRadius:12, display:'flex', alignItems:'center', gap:12, background: submitMsg.type==='success'?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)', border: `1px solid ${submitMsg.type==='success'?'rgba(34,197,94,0.3)':'rgba(239,68,68,0.3)'}`, color: submitMsg.type==='success'?'#4ade80':'#f87171' }}>
-                  {submitMsg.type==='success' ? <CheckCircle2 style={{ width:20, height:20 }}/> : <AlertCircle style={{ width:20, height:20 }}/>}
-                  <span style={{ fontWeight:600 }}>{submitMsg.text}</span>
-                </div>
-              )}
-
-              <div style={{ marginTop:32, display:'flex', justifyContent:'flex-end', alignItems:'center', gap:16 }}>
-                <button onClick={handleDescartar} style={{ background:'transparent', border:'none', color:'rgba(148,163,184,0.7)', cursor:'pointer', fontSize:15, fontWeight:600, padding:'10px 20px' }}>
-                  Descartar
-                </button>
-                <button onClick={handleLancar} disabled={isSubmitting} className="btn-cyber"
-                  style={{ display:'flex', alignItems:'center', gap:8, padding:'12px 32px', borderRadius:12, fontWeight:700, fontSize:15 }}>
-                  {isSubmitting ? <><Loader2 style={{ width:18,height:18,animation:'spin 1s linear infinite' }}/> Lançando...</> : 'Finalizar Matrícula'}
-                </button>
-              </div>
-            </div>
-
-            {/* Metrics cards row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-assemble">
-              {[
-                { label: 'Alunos Matriculados', value: '1,240', sub: 'Alunos Matriculados', icon: GraduationCap, color: '#a78bfa' },
-                { label: 'Turmas Ativas', value: '48', sub: 'Turmas Ativas', icon: Calendar, color: '#fbbf24' },
-                { label: 'Retenção Escolar', value: '94%', sub: 'Retenção Escolar', icon: TrendingDown, color: '#34d399' }
-              ].map(metric => (
-                <div key={metric.label} className="metric-card" style={{ opacity: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: 'rgba(148,163,184,0.7)', textTransform: 'uppercase', letterSpacing: 1 }}>{metric.label}</p>
-                    <div style={{ background: `${metric.color}20`, padding: 8, borderRadius: 10 }}>
-                      <metric.icon style={{ width: 18, height: 18, color: metric.color }} />
-                    </div>
-                  </div>
-                  <p className="metric-value" style={{ marginBottom: 8 }}>{metric.value}</p>
-                  <p style={{ fontSize: 12, color: 'rgba(148,163,184,0.5)' }}>{metric.sub}</p>
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, borderRadius: '0 0 16px 16px', background: `linear-gradient(90deg, ${metric.color}00, ${metric.color}60, ${metric.color}00)` }} />
-                </div>
-              ))}
-            </div>
-
-            {/* Alunos Recentemente Adicionados */}
-            <div className="cyber-card animate-assemble" style={{ padding:24 }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-                <h3 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize:16, fontWeight:700, color:'#e2e8f0', margin:0 }}>Alunos Recentemente Adicionados</h3>
-                <span onClick={() => setActiveTab('turmas')} style={{ fontSize:12, color:'#c4b5fd', fontWeight:600, cursor:'pointer' }}>Ver Todos</span>
-              </div>
-              <div style={{ overflowX:'auto' }}>
-                <table style={{ width:'100%', borderCollapse:'collapse', textAlign:'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom:'1px solid rgba(139,92,246,0.15)', color:'rgba(148,163,184,0.6)', fontSize:12, textTransform:'uppercase', letterSpacing:1 }}>
-                      <th style={{ padding:'12px 16px' }}>Estudante</th>
-                      <th style={{ padding:'12px 16px' }}>Turma</th>
-                      <th style={{ padding:'12px 16px' }}>Residência</th>
-                      <th style={{ padding:'12px 16px', textAlign:'right' }}>Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { initials: 'AB', name: 'Arthur Barbosa', age: '14 anos', class: '9º Ano B', residence: 'Belo Horizonte, MG', color: 'rgba(148,163,184,0.2)' },
-                      { initials: 'LM', name: 'Luisa Mendes', age: '15 anos', class: '1º Médio A', residence: 'Curitiba, PR', color: '#ea580c' }
-                    ].map((row, idx) => (
-                      <tr key={idx} style={{ borderBottom: idx === 1 ? 'none' : '1px solid rgba(139,92,246,0.1)' }}>
-                        <td style={{ padding:'14px 16px', display:'flex', alignItems:'center', gap:12 }}>
-                          <div style={{ width:36, height:36, borderRadius:'50%', background:row.initials==='LM'?'rgba(234,88,12,0.2)':'rgba(148,163,184,0.15)', border: row.initials==='LM'?'1px solid rgba(234,88,12,0.4)':'1px solid rgba(148,163,184,0.3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:700, color:row.initials==='LM'?'#fb923c':'#e2e8f0' }}>{row.initials}</div>
-                          <div>
-                            <p style={{ fontWeight:600, color:'#e2e8f0', margin:0 }}>{row.name}</p>
-                            <p style={{ fontSize:12, color:'rgba(148,163,184,0.5)', margin:0 }}>{row.age}</p>
-                          </div>
-                        </td>
-                        <td style={{ padding:'14px 16px', color:'#e2e8f0', fontSize:14 }}>{row.class}</td>
-                        <td style={{ padding:'14px 16px', color:'rgba(148,163,184,0.7)', fontSize:14 }}>{row.residence}</td>
-                        <td style={{ padding:'14px 16px', textAlign:'right' }}>
-                          <button style={{ background:'transparent', border:'none', color:'rgba(148,163,184,0.6)', cursor:'pointer' }}><MoreVertical size={18} /></button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB: Ver Turmas */}
-        {activeTab === 'turmas' && (
-          <div style={{ display:'flex', flexDirection:'column', gap:24 }}>
-            {/* Seletores */}
-            <div className="cyber-card animate-assemble" style={{ padding:24, display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:16 }}>
+        {/* Alunos Cadastrados (showStudents) */}
+        {showStudents && (
+          <div className="animate-assemble" style={{ marginBottom:24 }}>
+            <div className="cyber-card animate-assemble grid-responsive" style={{ padding:24, marginBottom:16 }}>
               <div>
                 <label style={labelStyle}>Instrutor</label>
                 <select value={selectedInstrutor} onChange={e => setSelectedInstrutor(e.target.value)} className="cyber-select" style={{ ...fieldStyle, cursor:'pointer' }}>
@@ -945,14 +788,11 @@ function TurmasScreen({ userEmail }) {
                 </select>
               </div>
             </div>
-
-            {/* Tabela de alunos */}
-            <div className="cyber-card animate-assemble" style={{ overflow:'hidden' }}>
+            <div className="cyber-card" style={{ overflow:'hidden' }}>
               <div style={{ padding:'16px 24px', borderBottom:'1px solid rgba(139,92,246,0.15)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                 <h3 style={{ fontWeight:700, color:'#e2e8f0', fontSize:15, margin:0 }}>Alunos Cadastrados</h3>
                 <span style={{ fontSize:12, background:'rgba(139,92,246,0.15)', padding:'4px 12px', borderRadius:20, color:'#c4b5fd', fontWeight:600 }}>{MOCK_ALUNOS.length} alunos</span>
               </div>
-              
               <div style={{ overflowX:'auto' }}>
                 <table style={{ width:'100%', borderCollapse:'collapse', textAlign:'left' }}>
                   <thead>
@@ -992,6 +832,98 @@ function TurmasScreen({ userEmail }) {
             </div>
           </div>
         )}
+
+        {/* Lançamento Rápido */}
+        <section className="animate-assemble" style={{ marginBottom:24 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12, paddingLeft:4 }}>
+            <Zap style={{ width:18, height:18, color:'#fbbf24' }}/>
+            <h2 style={{ fontSize:13, fontWeight:700, color:'rgba(148,163,184,0.6)', textTransform:'uppercase', letterSpacing:1 }}>Lançamento Rápido</h2>
+          </div>
+          <div className="cyber-card" style={{ padding:0, overflow:'hidden', position:'relative' }}>
+            <textarea
+              placeholder="Cole aqui a lista de nomes ou notas..."
+              value={promptIA}
+              onChange={e => setPromptIA(e.target.value)}
+              style={{ width:'100%', minHeight:120, padding:20, fontSize:15, background:'transparent', border:'none', outline:'none', color:'#e2e8f0', fontWeight:500, fontFamily:'Inter, sans-serif', resize:'none' }}
+            />
+            <button onClick={handleLancarIA} disabled={isLoadingIA || !promptIA.trim()}
+              style={{ position:'absolute', bottom:12, right:12, padding:10, borderRadius:10, background:'rgba(139,92,246,0.15)', border:'1px solid rgba(139,92,246,0.3)', color:'#a78bfa', cursor:'pointer', display:'flex' }}>
+              {isLoadingIA ? <Loader2 style={{ width:18, height:18, animation:'spin 1s linear infinite' }}/> : <Sparkles style={{ width:18, height:18 }}/>}
+            </button>
+          </div>
+        </section>
+
+        {/* Novo Aluno Form (glass card) */}
+        <section className="cyber-card animate-assemble" style={{ padding: isMobile ? 24 : 32, border:'1px solid rgba(139,92,246,0.3)', background:'rgba(22,12,40,0.5)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:24 }}>
+            <UserPlus style={{ width:20, height:20, color:'#a78bfa' }}/>
+            <h2 style={{ fontSize:20, fontWeight:700, color:'#e2e8f0', margin:0 }}>Novo Aluno</h2>
+          </div>
+
+          <div className="grid-responsive" style={{ gap:16 }}>
+            <div>
+              <label style={labelStyle}>Nome Completo</label>
+              <input type="text" value={formData.nome} onChange={handleForm('nome')} placeholder="Digite o nome do aluno" className="cyber-input" style={fieldStyle}/>
+            </div>
+            <div>
+              <label style={labelStyle}>Turma Destino</label>
+              <div style={{ position:'relative' }}>
+                <select value={formData.turma} onChange={handleForm('turma')} className="cyber-select" style={{ ...fieldStyle, cursor:'pointer', appearance:'none' }}>
+                  <option value="">Selecione uma turma</option>
+                  <option value="9º Ano B">9º Ano B</option>
+                  <option value="1º Médio A">1º Médio A</option>
+                </select>
+                <ChevronDown style={{ width:16, height:16, position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none', color:'rgba(148,163,184,0.5)' }}/>
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Cidade / Residência</label>
+              <input type="text" value={formData.cidade} onChange={handleForm('cidade')} placeholder="Ex: São Paulo" className="cyber-input" style={fieldStyle}/>
+            </div>
+            <div>
+              <label style={labelStyle}>Idade</label>
+              <input type="text" value={formData.idade} onChange={handleForm('idade')} placeholder="14" className="cyber-input" style={fieldStyle}/>
+            </div>
+            <div>
+              <label style={labelStyle}>Nome do Tutor</label>
+              <input type="text" value={formData.tutor} onChange={handleForm('tutor')} placeholder="Responsável legal" className="cyber-input" style={fieldStyle}/>
+            </div>
+            <div>
+              <label style={labelStyle}>Data de Nascimento</label>
+              <input type="date" value={formData.dn} onChange={handleForm('dn')} className="cyber-input" style={fieldStyle}/>
+            </div>
+            <div>
+              <label style={labelStyle}>Status</label>
+              <div style={{ display:'flex', gap:16, height:46, alignItems:'center', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(139,92,246,0.2)', borderRadius:12, padding:'0 16px' }}>
+                <label style={{ display:'flex', alignItems:'center', gap:8, color:'#e2e8f0', fontSize:14, cursor:'pointer' }}>
+                  <input type="radio" name="status" value="Ativo" checked={formData.status === 'Ativo'} onChange={handleForm('status')} style={{ accentColor:'#8b5cf6' }} />
+                  Ativo
+                </label>
+                <label style={{ display:'flex', alignItems:'center', gap:8, color:'#e2e8f0', fontSize:14, cursor:'pointer' }}>
+                  <input type="radio" name="status" value="Pendente" checked={formData.status === 'Pendente'} onChange={handleForm('status')} style={{ accentColor:'#8b5cf6' }} />
+                  Pendente
+                </label>
+              </div>
+            </div>
+            <div style={{ gridColumn:'1/-1' }}>
+              <label style={labelStyle}>Observações / Comentários</label>
+              <textarea value={formData.observacoes} onChange={handleForm('observacoes')} placeholder="Informações adicionais sobre o perfil do aluno..." className="cyber-input" style={{ ...fieldStyle, minHeight:100, resize:'vertical' }}/>
+            </div>
+          </div>
+
+          {submitMsg && (
+            <div style={{ marginTop:20, padding:'14px 20px', borderRadius:12, display:'flex', alignItems:'center', gap:12, background: submitMsg.type==='success'?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)', border: `1px solid ${submitMsg.type==='success'?'rgba(34,197,94,0.3)':'rgba(239,68,68,0.3)'}`, color: submitMsg.type==='success'?'#4ade80':'#f87171' }}>
+              {submitMsg.type==='success' ? <CheckCircle2 style={{ width:20, height:20 }}/> : <AlertCircle style={{ width:20, height:20 }}/>}
+              <span style={{ fontWeight:600 }}>{submitMsg.text}</span>
+            </div>
+          )}
+
+          <button onClick={handleLancar} disabled={isSubmitting} className="btn-cyber"
+            style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:8, padding:'14px 24px', borderRadius:12, fontWeight:700, fontSize:15, marginTop:24 }}>
+            {isSubmitting ? <><Loader2 style={{ width:18,height:18,animation:'spin 1s linear infinite' }}/> Lançando...</> : 'Finalizar Matrícula'}
+          </button>
+        </section>
+
       </div>
     </main>
   );
@@ -1000,7 +932,7 @@ function TurmasScreen({ userEmail }) {
 // ============================================================
 // TELA: RELATÓRIOS E FALTAS — CYBERPUNK DASHBOARD + CHATBOT
 // ============================================================
-function RelatoriosScreen() {
+function RelatoriosScreen({ isMobile }) {
   const [realData, setRealData] = useState([]);
   const [cidadeFilter, setCidadeFilter] = useState('');
   const [etapaFilter, setEtapaFilter] = useState('');
@@ -1125,8 +1057,8 @@ function RelatoriosScreen() {
   };
 
   return (
-    <main ref={containerRef} className="cyber-grid-bg" style={{ background:'#07060f', flex:1, overflowY:'auto', minHeight:0 }}>
-      <div style={{ padding:'28px 24px 80px', maxWidth:1280, margin:'0 auto', width:'100%' }}>
+    <main ref={containerRef} className="cyber-grid-bg" style={{ background:'#07060f', flex:1, minHeight:0, overflowY:'auto' }}>
+      <div style={{ padding: isMobile ? '20px 16px 80px' : '28px 24px 80px', maxWidth:1280, margin:'0 auto', width:'100%' }}>
 
         {/* ─── PAGE HEADER ─── */}
         <div className="animate-assemble" style={{ marginBottom:32, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:24, flexWrap:'wrap' }}>
@@ -1146,28 +1078,31 @@ function RelatoriosScreen() {
             </div>
             <p style={{ color:'rgba(148,163,184,0.6)', marginTop:6, fontSize:13 }}>Visão geral da frequência e assiduidade dos alunos no período atual.</p>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap', justifyContent:'flex-end' }}>
+          <div className="flex-responsive" style={{ alignItems:'center', justifyContent:'flex-end' }}>
             <select value={cidadeFilter} onChange={e => setCidadeFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:150 }}>
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:150, flex: isMobile ? '1 1 100%' : '0 1 auto' }}>
               <option value="">Todas as Cidades</option>
               {MOCK_CIDADES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <select value={etapaFilter} onChange={e => setEtapaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140 }}>
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140, flex: isMobile ? '1 1 100%' : '0 1 auto' }}>
               <option value="">Todas as Etapas</option>
-              <option value="1">1ª Etapa (Jan/Fev)</option>
-              <option value="2">2ª Etapa (Mar/Abr)</option>
-              <option value="3">3ª Etapa (Mai/Jun)</option>
+              <option value="1">1ª Etapa (Janeiro)</option>
+              <option value="2">2ª Etapa (Fevereiro)</option>
+              <option value="3">3ª Etapa (Março)</option>
+              <option value="4">4ª Etapa (Abril)</option>
+              <option value="5">5ª Etapa (Maio)</option>
+              <option value="6">6ª Etapa (Junho)</option>
             </select>
             <select value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140 }}>
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140, flex: isMobile ? '1 1 100%' : '0 1 auto' }}>
               <option value="">Todas as Matérias</option>
               {MOCK_TURMAS.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
-            <button onClick={() => loadPeriod(selectedPeriod)} style={{ padding:'10px 20px', borderRadius:10, border:'none', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700, boxShadow:'0 4px 12px rgba(139,92,246,0.3)' }}>
+            <button onClick={() => loadPeriod(selectedPeriod)} style={{ padding:'10px 20px', borderRadius:10, border:'none', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700, boxShadow:'0 4px 12px rgba(139,92,246,0.3)', flex: isMobile ? '1 1 100%' : '0 1 auto', justifyContent:'center' }}>
               <RefreshCw style={{ width:14, height:14 }}/>Atualizar
             </button>
-            <button onClick={() => setShowArchive(!showArchive)} style={{ padding:'10px 20px', borderRadius:10, border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.1)', color:'#c4b5fd', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700 }}>
+            <button onClick={() => setShowArchive(!showArchive)} style={{ padding:'10px 20px', borderRadius:10, border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.1)', color:'#c4b5fd', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700, flex: isMobile ? '1 1 100%' : '0 1 auto', justifyContent:'center' }}>
               <Database style={{ width:14, height:14 }}/>Arquivo
             </button>
           </div>
@@ -1196,7 +1131,7 @@ function RelatoriosScreen() {
         </div>
 
         {/* ─── MAIN GRID: TABLE + CHARTS ─── */}
-        <div className="animate-assemble" style={{ display:'grid', gridTemplateColumns:'1fr 320px', gap:24, marginBottom:32 }}>
+        <div className="animate-assemble dashboard-grid" style={{ display:'grid', gridTemplateColumns:'minmax(0,1fr) 320px', gap:24, marginBottom:32 }}>
 
           {/* Student Table */}
           <div className="cyber-card" style={{ padding:0, overflow:'hidden', background:'rgba(139,92,246,0.06)', borderColor:'rgba(139,92,246,0.2)' }}>
@@ -1205,13 +1140,13 @@ function RelatoriosScreen() {
               <button style={{ fontSize:11, padding:'6px 14px', borderRadius:20, background:'rgba(139,92,246,0.15)', color:'#c4b5fd', fontWeight:600, border:'1px solid rgba(139,92,246,0.3)', cursor:'pointer' }}>Ver todos</button>
             </div>
             {/* Table header */}
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 60px 140px 60px', gap:12, padding:'10px 24px', background:'rgba(255,255,255,0.02)', borderBottom:'1px solid rgba(139,92,246,0.08)', fontSize:11, fontWeight:700, color:'rgba(148,163,184,0.5)', textTransform:'uppercase', letterSpacing:0.8 }}>
+            <div className="student-row-header" style={{ display:'grid', gridTemplateColumns:'minmax(0,1fr) 60px 140px 60px', gap:12, padding:'10px 24px', background:'rgba(255,255,255,0.02)', borderBottom:'1px solid rgba(139,92,246,0.08)', fontSize:11, fontWeight:700, color:'rgba(148,163,184,0.5)', textTransform:'uppercase', letterSpacing:0.8 }}>
               <span>Aluno</span><span>Turno</span><span>Assiduidade</span><span>Faltas</span>
             </div>
             {MOCK_ALUNOS.map((aluno, idx) => {
               const assid = getAssiduidade(aluno);
               return (
-                <div key={aluno.id} style={{ display:'grid', gridTemplateColumns:'1fr 60px 140px 60px', gap:12, padding:'14px 24px', borderBottom: idx < MOCK_ALUNOS.length-1 ? '1px solid rgba(139,92,246,0.06)' : 'none', alignItems:'center', transition:'all 0.2s', cursor:'default' }}
+                <div key={aluno.id} className="student-row" style={{ display:'grid', gridTemplateColumns:'minmax(0,1fr) 60px 140px 60px', gap:12, padding:'14px 24px', borderBottom: idx < MOCK_ALUNOS.length-1 ? '1px solid rgba(139,92,246,0.06)' : 'none', alignItems:'center', transition:'all 0.2s', cursor:'default' }}
                   onMouseEnter={e => { e.currentTarget.style.background='rgba(139,92,246,0.07)'; e.currentTarget.style.borderRadius='8px'; }}
                   onMouseLeave={e => { e.currentTarget.style.background='transparent'; }}>
                   <div style={{ display:'flex', alignItems:'center', gap:10 }}>
@@ -1340,38 +1275,46 @@ function RelatoriosScreen() {
 // ============================================================
 // APP PRINCIPAL — BRASIL.IA
 // ============================================================
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const handler = (e) => setMatches(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, [query]);
+  return matches;
+}
+
 export default function App() {
   const [activeScreen, setActiveScreen] = useState('relatorios');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const sidebarRef    = useRef(null);
   const contentRef    = useRef(null);
+  const isMobile = useMediaQuery('(max-width: 640px)');
+  const isTablet = useMediaQuery('(min-width: 641px) and (max-width: 1024px)');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
 
   const userEmail = ADMIN_EMAIL;
   const isAdmin   = userEmail === ADMIN_EMAIL;
 
   useEffect(() => {
-    if (window.innerWidth < 768) setIsSidebarOpen(false);
-    // GSAP: sidebar entrance
     if (sidebarRef.current) {
       gsap.fromTo(sidebarRef.current,
         { x: -320, opacity: 0 },
         { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }
       );
     }
-    // GSAP: content entrance
     if (contentRef.current) {
       gsap.fromTo(contentRef.current,
         { opacity: 0, x: 20 },
         { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out', delay: 0.15 }
       );
     }
-    // Apply mount class for CSS fallback animations
     if (contentRef.current) {
       contentRef.current.classList.add('mount-assemble');
       setTimeout(() => { contentRef.current && contentRef.current.classList.remove('mount-assemble'); }, 800);
     }
-    // GSAP: AI button slide-in (simula saída lateral)
     setTimeout(() => {
       const fab = document.querySelector('.fab-ai');
       const toggle = document.querySelector('.desktop-ai-toggle');
@@ -1395,7 +1338,7 @@ export default function App() {
         setTimeout(() => { contentRef.current && contentRef.current.classList.remove('mount-assemble'); }, 600);
       }
     });
-    if (window.innerWidth < 768) setIsSidebarOpen(false);
+    if (isMobile) setIsSidebarOpen(false);
   };
 
   const navItems = [
@@ -1415,27 +1358,25 @@ export default function App() {
   return (
     <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#07060f' }}>
 
-      {/* Mobile overlay */}
-      {isSidebarOpen && window.innerWidth < 768 && (
-        <div onClick={() => setIsSidebarOpen(false)}
-          style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:40 }}/>
+      {isSidebarOpen && isMobile && (
+        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}/>
       )}
 
       {/* ── SIDEBAR ── */}
       <aside
         ref={sidebarRef}
-        className="sidebar-cyber"
+        className={`sidebar-cyber ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
         style={{
-          width: isSidebarOpen ? 280 : 0,
-          minWidth: isSidebarOpen ? 280 : 0,
+          width: isMobile ? '100vw' : isTablet ? 240 : (isSidebarOpen ? 280 : 0),
+          minWidth: isMobile ? '100vw' : isTablet ? 240 : (isSidebarOpen ? 280 : 0),
           overflow: 'hidden',
           height:'100%',
           display:'flex', flexDirection:'column',
           transition: 'width 0.3s ease, min-width 0.3s ease',
-          position: 'relative',
+          position: isMobile ? 'fixed' : 'relative',
           zIndex: 50,
         }}>
-        <div style={{ width:280, display:'flex', flexDirection:'column', height:'100%' }}>
+        <div style={{ width:'100%', display:'flex', flexDirection:'column', height:'100%', maxWidth: isMobile ? '100vw' : 280 }}>
 
           {/* Logo */}
           <div style={{ height:68, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 20px', borderBottom:'1px solid rgba(139,92,246,0.15)', flexShrink:0 }}>
@@ -1502,7 +1443,7 @@ export default function App() {
               onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.05)'}>
               <Menu style={{ width:20, height:20 }}/>
             </button>
-            <h1 style={{ fontFamily:'Space Grotesk, sans-serif', fontWeight:600, fontSize:16, color:'#e2e8f0' }}>{screenTitles[activeScreen]}</h1>
+            <h1 style={{ fontFamily:'Space Grotesk, sans-serif', fontWeight:600, fontSize: isMobile ? 14 : 16, color:'#e2e8f0', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth: isMobile ? '140px' : 'none' }}>{screenTitles[activeScreen]}</h1>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             <button style={{ background:'transparent', border:'none', color:'rgba(148,163,184,0.7)', cursor:'pointer', padding:4, display:'flex', position:'relative', outline:'none' }} title="Notificações">
@@ -1522,13 +1463,13 @@ export default function App() {
         <div ref={contentRef} style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column', minHeight:0 }}>
           {activeScreen === 'diario'     && <DiarioScreen userEmail={userEmail}/>}
           {activeScreen === 'gerar'      && <GerarRelatoriosScreen userEmail={userEmail}/>}
-          {activeScreen === 'turmas'     && <TurmasScreen userEmail={userEmail}/>}
-          {activeScreen === 'relatorios' && <RelatoriosScreen/>}
+          {activeScreen === 'turmas'     && <TurmasScreen userEmail={userEmail} isMobile={isMobile}/>}
+          {activeScreen === 'relatorios' && <RelatoriosScreen isMobile={isMobile}/>}
         </div>
       </div>
 
       {/* Badge BY ALAN */}
-      <div style={{ position:'fixed', bottom:20, right: isAIChatOpen && window.innerWidth > 768 ? 400 : 20, zIndex:100, display:'flex', flexDirection:'column', alignItems:'center', gap:6, pointerEvents:'none', transition:'right 0.4s' }}>
+      <div className="by-alan-badge" style={{ position:'fixed', bottom:20, right: isAIChatOpen && !isMobile ? 400 : 20, zIndex:100, display:'flex', flexDirection:'column', alignItems:'center', gap:6, pointerEvents:'none', transition:'right 0.4s' }}>
         <div style={{ background:'rgba(13,11,30,0.9)', padding:6, borderRadius:14, border:'1px solid rgba(139,92,246,0.3)', boxShadow:'0 0 20px rgba(139,92,246,0.2)' }}>
           <BrasilIARobot size={32}/>
         </div>
@@ -1547,7 +1488,7 @@ export default function App() {
              <Brain size={20} className="robot-pulse" />
              <span style={{ fontSize:10, fontWeight:800, marginTop:4, color:'white' }}>IA</span>
           </div>
-          <GlobalChatbot isOpen={isAIChatOpen} onClose={() => setIsAIChatOpen(false)} isMobile={window.innerWidth < 768} />
+          <GlobalChatbot isOpen={isAIChatOpen} onClose={() => setIsAIChatOpen(false)} isMobile={isMobile} />
         </>
       )}
     </div>
