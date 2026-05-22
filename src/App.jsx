@@ -1073,46 +1073,46 @@ function RelatoriosScreen() {
       <div style={{ padding:'28px 24px 80px', maxWidth:1280, margin:'0 auto' }}>
 
         {/* ─── PAGE HEADER ─── */}
-        <div className="animate-assemble" style={{ marginBottom:32, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+        <div className="animate-assemble" style={{ marginBottom:32, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:24 }}>
           <div>
             <h2 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize:'1.75rem', fontWeight:700, background:'linear-gradient(135deg, #c4b5fd 0%, #ffffff 60%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
               Relatórios de Faltas
             </h2>
-            <p style={{ color:'rgba(148,163,184,0.7)', marginTop:4, fontSize:14 }}>Dashboard de assiduidade em tempo real • Maio 2026</p>
+            <p style={{ color:'rgba(148,163,184,0.6)', marginTop:6, fontSize:13 }}>Visão geral da frequência e assiduidade dos alunos no período atual.</p>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'nowrap', justifyContent:'flex-end' }}>
             <select value={cidadeFilter} onChange={e => setCidadeFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'8px 16px', fontSize:13 }}>
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:150 }}>
               <option value="">Todas as Cidades</option>
               {MOCK_CIDADES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <select value={etapaFilter} onChange={e => setEtapaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'8px 16px', fontSize:13 }}>
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140 }}>
               <option value="">Todas as Etapas</option>
               <option value="1">1ª Etapa (Jan/Fev)</option>
               <option value="2">2ª Etapa (Mar/Abr)</option>
               <option value="3">3ª Etapa (Mai/Jun)</option>
             </select>
             <select value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'8px 16px', fontSize:13 }}>
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140 }}>
               <option value="">Todas as Matérias</option>
               {MOCK_TURMAS.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
-            <button style={{ padding:'8px 14px', borderRadius:10, border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.1)', color:'#a78bfa', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:600 }}>
+            <button style={{ padding:'10px 24px', borderRadius:10, border:'none', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', gap:8, fontSize:12, fontWeight:700, boxShadow:'0 4px 12px rgba(139,92,246,0.3)' }}>
               <RefreshCw style={{ width:14, height:14 }}/>Atualizar
             </button>
           </div>
         </div>
 
         {/* ─── METRIC CARDS ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-assemble" style={{ marginBottom:28 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:16, marginBottom:28 }} className="animate-assemble">
           {[
-            { label:'Total de Alunos', value: totalAlunos, icon: Users, color:'#a78bfa', sub:'ativos no período' },
+            { label:'Total de Alunos', value: totalAlunos, icon: Users, color:'#c4b5fd', sub:'ativos no período' },
             { label:'Méd. Assiduidade', value: `${mediaAssid}%`, icon: Activity, color:'#34d399', sub:'da turma geral' },
             { label:'Alunos em Risco', value: emRisco, icon: AlertTriangle, color:'#f87171', sub:'abaixo de 75%' },
             { label:'Total de Presenças', value: totalPresencas, icon: CheckCircle2, color:'#60a5fa', sub:'registradas' },
           ].map(({ label, value, icon: Icon, color, sub }) => (
-            <div key={label} className="metric-card" style={{ opacity:1 }}>
+            <div key={label} className="metric-card" style={{ opacity:1, background:'rgba(139,92,246,0.06)', borderColor:'rgba(139,92,246,0.2)' }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
                 <p style={{ fontSize:12, fontWeight:600, color:'rgba(148,163,184,0.7)', textTransform:'uppercase', letterSpacing:1 }}>{label}</p>
                 <div style={{ background:`${color}20`, padding:8, borderRadius:10 }}>
@@ -1127,13 +1127,13 @@ function RelatoriosScreen() {
         </div>
 
         {/* ─── MAIN GRID: TABLE + CHARTS ─── */}
-        <div className="animate-assemble" style={{ display:'grid', gridTemplateColumns:'1fr 300px', gap:20, marginBottom:28 }}>
+        <div className="animate-assemble" style={{ display:'grid', gridTemplateColumns:'1fr 320px', gap:24, marginBottom:32 }}>
 
           {/* Student Table */}
-          <div className="cyber-card" style={{ padding:0, overflow:'hidden' }}>
-            <div style={{ padding:'18px 24px', borderBottom:'1px solid rgba(139,92,246,0.15)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div className="cyber-card" style={{ padding:0, overflow:'hidden', background:'rgba(139,92,246,0.06)', borderColor:'rgba(139,92,246,0.2)' }}>
+            <div style={{ padding:'20px 24px', borderBottom:'1px solid rgba(139,92,246,0.15)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
               <h3 style={{ fontFamily:'Space Grotesk, sans-serif', fontWeight:600, color:'#e2e8f0', fontSize:15 }}>Lista de Alunos</h3>
-              <span style={{ fontSize:11, padding:'4px 12px', borderRadius:20, background:'rgba(139,92,246,0.15)', color:'#a78bfa', fontWeight:600, border:'1px solid rgba(139,92,246,0.25)' }}>{MOCK_ALUNOS.length} alunos</span>
+              <button style={{ fontSize:11, padding:'6px 14px', borderRadius:20, background:'rgba(139,92,246,0.15)', color:'#c4b5fd', fontWeight:600, border:'1px solid rgba(139,92,246,0.3)', cursor:'pointer' }}>Ver todos</button>
             </div>
             {/* Table header */}
             <div style={{ display:'grid', gridTemplateColumns:'1fr 60px 140px 60px', gap:12, padding:'10px 24px', background:'rgba(255,255,255,0.02)', borderBottom:'1px solid rgba(139,92,246,0.08)', fontSize:11, fontWeight:700, color:'rgba(148,163,184,0.5)', textTransform:'uppercase', letterSpacing:0.8 }}>
