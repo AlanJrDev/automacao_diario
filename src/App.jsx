@@ -1007,66 +1007,82 @@ function RelatoriosScreen() {
   const [turmaFilter, setTurmaFilter] = useState('');
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [dataSource, setDataSource] = useState('loading');
+  const [showArchive, setShowArchive] = useState(false);
+  const [archiveList, setArchiveList] = useState([]);
+  const [selectedPeriod, setSelectedPeriod] = useState(null);
   
   const containerRef = useRef(null);
 
-  useEffect(() => {
-    // Determine current period key (YYYY-MM)
-    const now = new Date();
-    const period = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    window.scrollTo(0, 0);
-
-    // migrate previous cached current data to archive if period changed
+  const loadArchive = () => {
     try {
-      const savedPeriod = localStorage.getItem('relatorios_current_period');
-      const savedDataKey = 'relatorios_cache_' + savedPeriod;
-      if (savedPeriod && savedPeriod !== period) {
-        const savedJson = localStorage.getItem(savedDataKey);
-        if (savedJson) {
-          const archiveRaw = localStorage.getItem('relatorios_archive');
-          const archive = archiveRaw ? JSON.parse(archiveRaw) : [];
-          // push archive entry if not exists
-          if (!archive.find(a => a.period === savedPeriod)) {
-            archive.push({ period: savedPeriod, storedAt: new Date().toISOString(), data: JSON.parse(savedJson) });
-            localStorage.setItem('relatorios_archive', JSON.stringify(archive));
-          }
-        }
-      }
-    } catch (err) {
-      console.warn('archive error', err);
-    }
+      const raw = localStorage.getItem('relatorios_archive');
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  };
 
-    // If we have cached data for current period, use it
-    const cacheKey = 'relatorios_cache_' + period;
+  const loadPeriod = (period) => {
+    const now = new Date();
+    const currentPeriod = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const periodLabel = period || currentPeriod;
+    setSelectedPeriod(periodLabel);
+    setIsLoadingData(true);
+    setProgressLoaded(false);
+
+    const cacheKey = 'relatorios_cache_' + periodLabel;
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
-      try { setRealData(JSON.parse(cached)); } catch(e) { setRealData(MOCK_ALUNOS); }
+      try { setRealData(JSON.parse(cached)); setDataSource('cache'); } catch { setRealData(MOCK_ALUNOS); setDataSource('mock'); }
       setIsLoadingData(false);
       setTimeout(() => setProgressLoaded(true), 300);
-      // ensure marker
-      localStorage.setItem('relatorios_current_period', period);
+      if (!period) localStorage.setItem('relatorios_current_period', periodLabel);
       return;
     }
 
-    // Otherwise fetch from server for specific period
-    fetch(`${APPS_SCRIPT_URL}?acao=listar&period=${period}`)
+    fetch(`${APPS_SCRIPT_URL}?acao=listar&period=${periodLabel}`)
       .then(r => r.json())
       .then(d => {
         if (d.status === 'success' && d.data) {
           setRealData(d.data);
-          try { localStorage.setItem(cacheKey, JSON.stringify(d.data)); localStorage.setItem('relatorios_current_period', period); } catch(e){}
+          setDataSource('live');
+          try { localStorage.setItem(cacheKey, JSON.stringify(d.data)); } catch(e){}
+          if (!period) localStorage.setItem('relatorios_current_period', periodLabel);
         } else {
           setRealData(MOCK_ALUNOS);
+          setDataSource('mock');
         }
       })
       .catch(e => {
-        console.warn('fetch relatorios failed', e);
+        console.warn('fetch failed', e);
         setRealData(MOCK_ALUNOS);
+        setDataSource('mock');
       })
       .finally(() => {
         setIsLoadingData(false);
         setTimeout(() => setProgressLoaded(true), 600);
       });
+  };
+
+  useEffect(() => {
+    const now = new Date();
+    const period = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    window.scrollTo(0, 0);
+
+    const savedPeriod = localStorage.getItem('relatorios_current_period');
+    const savedDataKey = 'relatorios_cache_' + savedPeriod;
+    if (savedPeriod && savedPeriod !== period) {
+      const savedJson = localStorage.getItem(savedDataKey);
+      if (savedJson) {
+        const archive = loadArchive();
+        if (!archive.find(a => a.period === savedPeriod)) {
+          archive.push({ period: savedPeriod, storedAt: new Date().toISOString(), data: JSON.parse(savedJson) });
+          try { localStorage.setItem('relatorios_archive', JSON.stringify(archive)); } catch(e) { console.warn('archive store fail', e); }
+        }
+      }
+    }
+
+    setArchiveList(loadArchive());
+    loadPeriod(null);
   }, []);
 
   // GSAP: mount animation for staggered elements
@@ -1113,14 +1129,24 @@ function RelatoriosScreen() {
       <div style={{ padding:'28px 24px 80px', maxWidth:1280, margin:'0 auto', width:'100%' }}>
 
         {/* ─── PAGE HEADER ─── */}
-        <div className="animate-assemble" style={{ marginBottom:32, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:24 }}>
+        <div className="animate-assemble" style={{ marginBottom:32, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:24, flexWrap:'wrap' }}>
           <div>
-            <h2 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize:'1.75rem', fontWeight:700, background:'linear-gradient(135deg, #c4b5fd 0%, #ffffff 60%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
-              Relatórios de Faltas
-            </h2>
+            <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
+              <h2 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize:'1.75rem', fontWeight:700, background:'linear-gradient(135deg, #c4b5fd 0%, #ffffff 60%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
+                Relatórios de Faltas
+              </h2>
+              {dataSource !== 'loading' && (
+                <span style={{ fontSize:10, padding:'3px 10px', borderRadius:20, fontWeight:700, display:'inline-flex', alignItems:'center', gap:4,
+                  background: dataSource==='live'?'rgba(34,197,94,0.15)':'rgba(245,158,11,0.15)',
+                  color: dataSource==='live'?'#4ade80':'#fbbf24',
+                  border: `1px solid ${dataSource==='live'?'rgba(34,197,94,0.3)':'rgba(245,158,11,0.3)'}` }}>
+                  {dataSource==='live' ? <><Database style={{width:10,height:10}}/> Planilha</> : dataSource==='cache' ? 'Cache' : 'Mock'}
+                </span>
+              )}
+            </div>
             <p style={{ color:'rgba(148,163,184,0.6)', marginTop:6, fontSize:13 }}>Visão geral da frequência e assiduidade dos alunos no período atual.</p>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'nowrap', justifyContent:'flex-end' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap', justifyContent:'flex-end' }}>
             <select value={cidadeFilter} onChange={e => setCidadeFilter(e.target.value)}
               className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:150 }}>
               <option value="">Todas as Cidades</option>
@@ -1138,8 +1164,11 @@ function RelatoriosScreen() {
               <option value="">Todas as Matérias</option>
               {MOCK_TURMAS.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
-            <button style={{ padding:'10px 24px', borderRadius:10, border:'none', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', gap:8, fontSize:12, fontWeight:700, boxShadow:'0 4px 12px rgba(139,92,246,0.3)' }}>
+            <button onClick={() => loadPeriod(selectedPeriod)} style={{ padding:'10px 20px', borderRadius:10, border:'none', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700, boxShadow:'0 4px 12px rgba(139,92,246,0.3)' }}>
               <RefreshCw style={{ width:14, height:14 }}/>Atualizar
+            </button>
+            <button onClick={() => setShowArchive(!showArchive)} style={{ padding:'10px 20px', borderRadius:10, border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.1)', color:'#c4b5fd', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700 }}>
+              <Database style={{ width:14, height:14 }}/>Arquivo
             </button>
           </div>
         </div>
@@ -1274,6 +1303,35 @@ function RelatoriosScreen() {
             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* ─── ARCHIVE PANEL ─── */}
+        {showArchive && (
+          <div className="animate-assemble cyber-card" style={{ padding:24, marginBottom:28 }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
+              <h3 style={{ fontFamily:'Space Grotesk, sans-serif', fontWeight:700, color:'#e2e8f0', fontSize:16, margin:0, display:'flex', alignItems:'center', gap:8 }}>
+                <Database style={{ width:18, height:18, color:'#c4b5fd' }}/> Arquivo de Períodos
+              </h3>
+              <button onClick={() => setShowArchive(false)} style={{ background:'transparent', border:'none', color:'rgba(148,163,184,0.6)', cursor:'pointer', fontSize:13, fontWeight:600 }}>Fechar</button>
+            </div>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+              <button onClick={() => {
+                const now = new Date();
+                loadPeriod(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`);
+              }} style={{ padding:'10px 18px', borderRadius:10, border:'1px solid rgba(139,92,246,0.3)', background: !selectedPeriod || selectedPeriod === `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}` ? 'rgba(139,92,246,0.2)' : 'rgba(139,92,246,0.08)', color:'#c4b5fd', cursor:'pointer', fontSize:13, fontWeight:600, transition:'all 0.2s' }}>
+                Período Atual
+              </button>
+              {archiveList.map((a, i) => (
+                <button key={i} onClick={() => loadPeriod(a.period)}
+                  style={{ padding:'10px 18px', borderRadius:10, border:'1px solid rgba(139,92,246,0.3)', background: selectedPeriod === a.period ? 'rgba(139,92,246,0.2)' : 'rgba(139,92,246,0.08)', color:'#c4b5fd', cursor:'pointer', fontSize:13, fontWeight:600, transition:'all 0.2s' }}>
+                  {a.period}
+                </button>
+              ))}
+            </div>
+            {archiveList.length === 0 && (
+              <p style={{ color:'rgba(148,163,184,0.5)', fontSize:14, textAlign:'center', padding:20 }}>Nenhum período arquivado ainda. Os dados de meses anteriores serão arquivados automaticamente.</p>
+            )}
+          </div>
+        )}
       </div>
     </main>
   );
