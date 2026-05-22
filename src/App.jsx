@@ -181,37 +181,40 @@ export const GlobalChatbot = ({ isOpen, onClose, isMobile }) => {
     <>
       {isOpen && isMobile && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:99 }} onClick={onClose} />}
       <div className={`chatbot-sidebar ${isOpen ? 'open' : ''}`}>
-        <div style={{ padding: '20px', borderBottom: '1px solid rgba(139,92,246,0.15)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <div style={{ background:'linear-gradient(135deg,rgba(139,92,246,0.2),rgba(124,58,237,0.1))', padding:8, borderRadius:10 }}>
-              <Brain style={{ width:18, height:18, color:'#a78bfa' }}/>
+        <div style={{ padding: '20px', borderBottom: '1px solid rgba(139,92,246,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background:'rgba(139,92,246,0.04)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <div style={{ background:'linear-gradient(135deg,#8b5cf6,#7c3aed)', padding:10, borderRadius:12, boxShadow:'0 0 12px rgba(139,92,246,0.4)' }}>
+              <Brain style={{ width:18, height:18, color:'white' }}  className="robot-pulse"/>
             </div>
-            <h3 style={{ fontWeight: 'bold', color: 'white' }}>IA Global</h3>
+            <div>
+              <h3 style={{ fontWeight: '700', color: '#e2e8f0', fontSize:15, margin:0 }}>IA Global</h3>
+              <p style={{ fontSize:11, color:'rgba(139,92,246,0.6)', margin:'2px 0 0 0' }}>Assistente Brasil.IA</p>
+            </div>
           </div>
-          <button onClick={onClose} style={{ background:'transparent', border:'none', color:'white', cursor:'pointer' }}><X /></button>
+          <button onClick={onClose} style={{ background:'transparent', border:'none', color:'rgba(139,92,246,0.6)', cursor:'pointer', padding:4, display:'flex' }}><X size={20}/></button>
         </div>
         
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {chatMessages.map((msg, idx) => (
-            <div key={idx} style={{ display:'flex', flexDirection: msg.role==='user' ? 'row-reverse' : 'row', alignItems:'flex-start', gap:10 }}>
+            <div key={idx} style={{ display:'flex', flexDirection: msg.role==='user' ? 'row-reverse' : 'row', alignItems:'flex-end', gap:8 }}>
               {msg.role === 'ai' && (
-                <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,rgba(139,92,246,0.3),rgba(124,58,237,0.2))', border:'1px solid rgba(139,92,246,0.3)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                  <Bot style={{ width:14, height:14, color:'#a78bfa' }}/>
+                <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#8b5cf6,#7c3aed)', border:'2px solid rgba(139,92,246,0.4)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 0 8px rgba(139,92,246,0.3)' }}>
+                  <Bot style={{ width:14, height:14, color:'white' }}/>
                 </div>
               )}
-              <div className={msg.role === 'ai' ? 'chat-bubble-ai' : 'chat-bubble-user'} style={{ whiteSpace:'pre-wrap' }}>
-                <p style={{ fontSize:14, color:'#e2e8f0', lineHeight:1.6, margin:0 }}>{msg.text}</p>
+              <div className={msg.role === 'ai' ? 'chat-bubble-ai' : 'chat-bubble-user'} style={{ whiteSpace:'pre-wrap', maxWidth:'280px' }}>
+                <p style={{ fontSize:13, color:'#e2e8f0', lineHeight:1.5, margin:0 }}>{msg.text}</p>
               </div>
             </div>
           ))}
           {isChatLoading && (
-            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-              <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,rgba(139,92,246,0.3),rgba(124,58,237,0.2))', border:'1px solid rgba(139,92,246,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <Bot style={{ width:14, height:14, color:'#a78bfa' }}/>
+            <div style={{ display:'flex', alignItems:'flex-end', gap:8 }}>
+              <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#8b5cf6,#7c3aed)', border:'2px solid rgba(139,92,246,0.4)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 8px rgba(139,92,246,0.3)' }}>
+                <Bot style={{ width:14, height:14, color:'white' }}/>
               </div>
-              <div className="chat-bubble-ai" style={{ display:'flex', gap:4, alignItems:'center' }}>
+              <div className="chat-bubble-ai" style={{ display:'flex', gap:3, alignItems:'center', padding:'8px 12px' }}>
                 {[0,1,2].map(i => (
-                  <div key={i} style={{ width:7, height:7, borderRadius:'50%', background:'#8b5cf6', animation:`blink 1.2s ${i*0.2}s ease-in-out infinite` }}/>
+                  <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#c4b5fd', animation:`blink 1.2s ${i*0.2}s ease-in-out infinite` }}/>
                 ))}
               </div>
             </div>
@@ -219,7 +222,7 @@ export const GlobalChatbot = ({ isOpen, onClose, isMobile }) => {
           <div ref={chatEndRef} />
         </div>
         
-        <div style={{ padding: '16px', borderTop: '1px solid rgba(139,92,246,0.15)' }}>
+        <div style={{ padding: '16px', borderTop: '1px solid rgba(139,92,246,0.2)', background:'rgba(139,92,246,0.03)' }}>
           <div style={{ display: 'flex', gap: 8 }}>
             <input 
               type="text" 
@@ -227,10 +230,11 @@ export const GlobalChatbot = ({ isOpen, onClose, isMobile }) => {
               onChange={e => setChatInput(e.target.value)} 
               onKeyDown={e => e.key === 'Enter' && handleChatSend()}
               placeholder="Digite sua dúvida..." 
-              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #4c1d95', background: '#1a1030', color: 'white', outline:'none' }}
+              style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(139,92,246,0.25)', background: '#0f0a1c', color: '#e2e8f0', outline:'none', fontSize:13, fontWeight:500 }}
+              className="cyber-input"
             />
-            <button onClick={handleChatSend} style={{ padding:'10px', borderRadius:'8px', background:'#8b5cf6', border:'none', color:'white', cursor:'pointer' }}>
-              <Send size={18} />
+            <button onClick={handleChatSend} style={{ padding:'12px 14px', borderRadius:'10px', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', border:'none', color:'white', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 12px rgba(139,92,246,0.3)' }}>
+              <Send size={16} />
             </button>
           </div>
         </div>
@@ -325,7 +329,7 @@ function DiarioScreen({ userEmail }) {
   };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f' }}>
+    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0 }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }} className="space-y-6">
         <div className="animate-assemble">
           <h2 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize: '1.875rem', fontWeight: 800, background: 'linear-gradient(135deg, #c4b5fd 0%, #ffffff 60%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>Lançamento Inteligente</h2>
@@ -533,7 +537,7 @@ Período: 01/05/2026 a 31/05/2026`);
   };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f' }}>
+    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0 }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }} className="space-y-6">
         
         {/* Header */}
@@ -724,7 +728,7 @@ function TurmasScreen({ userEmail }) {
   const labelStyle = { fontSize:12, fontWeight:600, color:'rgba(148,163,184,0.7)', textTransform:'uppercase', letterSpacing:0.8, marginBottom:6, display:'block' };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f' }}>
+    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0 }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         
         {/* Header */}
@@ -1007,21 +1011,57 @@ function RelatoriosScreen() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0); // O topo é exibido primeiro!
+    // Determine current period key (YYYY-MM)
+    const now = new Date();
+    const period = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    window.scrollTo(0, 0);
 
-    // Fetch de Dados Reais do Sheets (Simulação usando o APPS_SCRIPT_URL existente)
-    // Quando o usuário implementar o doGet() no .gs, isso puxará os dados reais.
-    fetch(APPS_SCRIPT_URL + '?acao=listar')
+    // migrate previous cached current data to archive if period changed
+    try {
+      const savedPeriod = localStorage.getItem('relatorios_current_period');
+      const savedDataKey = 'relatorios_cache_' + savedPeriod;
+      if (savedPeriod && savedPeriod !== period) {
+        const savedJson = localStorage.getItem(savedDataKey);
+        if (savedJson) {
+          const archiveRaw = localStorage.getItem('relatorios_archive');
+          const archive = archiveRaw ? JSON.parse(archiveRaw) : [];
+          // push archive entry if not exists
+          if (!archive.find(a => a.period === savedPeriod)) {
+            archive.push({ period: savedPeriod, storedAt: new Date().toISOString(), data: JSON.parse(savedJson) });
+            localStorage.setItem('relatorios_archive', JSON.stringify(archive));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('archive error', err);
+    }
+
+    // If we have cached data for current period, use it
+    const cacheKey = 'relatorios_cache_' + period;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try { setRealData(JSON.parse(cached)); } catch(e) { setRealData(MOCK_ALUNOS); }
+      setIsLoadingData(false);
+      setTimeout(() => setProgressLoaded(true), 300);
+      // ensure marker
+      localStorage.setItem('relatorios_current_period', period);
+      return;
+    }
+
+    // Otherwise fetch from server for specific period
+    fetch(`${APPS_SCRIPT_URL}?acao=listar&period=${period}`)
       .then(r => r.json())
       .then(d => {
         if (d.status === 'success' && d.data) {
           setRealData(d.data);
+          try { localStorage.setItem(cacheKey, JSON.stringify(d.data)); localStorage.setItem('relatorios_current_period', period); } catch(e){}
         } else {
-          setRealData(MOCK_ALUNOS); // Fallback caso não tenha doGet
+          setRealData(MOCK_ALUNOS);
         }
       })
       .catch(e => {
-        setRealData(MOCK_ALUNOS); // Fallback
+        console.warn('fetch relatorios failed', e);
+        setRealData(MOCK_ALUNOS);
       })
       .finally(() => {
         setIsLoadingData(false);
@@ -1069,50 +1109,50 @@ function RelatoriosScreen() {
   };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto cyber-grid-bg" style={{ background:'#07060f' }}>
-      <div style={{ padding:'28px 24px 80px', maxWidth:1280, margin:'0 auto' }}>
+    <main ref={containerRef} className="cyber-grid-bg" style={{ background:'#07060f', flex:1, overflowY:'auto', minHeight:0 }}>
+      <div style={{ padding:'28px 24px 80px', maxWidth:1280, margin:'0 auto', width:'100%' }}>
 
         {/* ─── PAGE HEADER ─── */}
-        <div className="animate-assemble" style={{ marginBottom:32, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+        <div className="animate-assemble" style={{ marginBottom:32, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:24 }}>
           <div>
             <h2 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize:'1.75rem', fontWeight:700, background:'linear-gradient(135deg, #c4b5fd 0%, #ffffff 60%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
               Relatórios de Faltas
             </h2>
-            <p style={{ color:'rgba(148,163,184,0.7)', marginTop:4, fontSize:14 }}>Dashboard de assiduidade em tempo real • Maio 2026</p>
+            <p style={{ color:'rgba(148,163,184,0.6)', marginTop:6, fontSize:13 }}>Visão geral da frequência e assiduidade dos alunos no período atual.</p>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'nowrap', justifyContent:'flex-end' }}>
             <select value={cidadeFilter} onChange={e => setCidadeFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'8px 16px', fontSize:13 }}>
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:150 }}>
               <option value="">Todas as Cidades</option>
               {MOCK_CIDADES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <select value={etapaFilter} onChange={e => setEtapaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'8px 16px', fontSize:13 }}>
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140 }}>
               <option value="">Todas as Etapas</option>
               <option value="1">1ª Etapa (Jan/Fev)</option>
               <option value="2">2ª Etapa (Mar/Abr)</option>
               <option value="3">3ª Etapa (Mai/Jun)</option>
             </select>
             <select value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'8px 16px', fontSize:13 }}>
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140 }}>
               <option value="">Todas as Matérias</option>
               {MOCK_TURMAS.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
-            <button style={{ padding:'8px 14px', borderRadius:10, border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.1)', color:'#a78bfa', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:600 }}>
+            <button style={{ padding:'10px 24px', borderRadius:10, border:'none', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', gap:8, fontSize:12, fontWeight:700, boxShadow:'0 4px 12px rgba(139,92,246,0.3)' }}>
               <RefreshCw style={{ width:14, height:14 }}/>Atualizar
             </button>
           </div>
         </div>
 
         {/* ─── METRIC CARDS ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-assemble" style={{ marginBottom:28 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:16, marginBottom:28 }} className="animate-assemble">
           {[
-            { label:'Total de Alunos', value: totalAlunos, icon: Users, color:'#a78bfa', sub:'ativos no período' },
+            { label:'Total de Alunos', value: totalAlunos, icon: Users, color:'#c4b5fd', sub:'ativos no período' },
             { label:'Méd. Assiduidade', value: `${mediaAssid}%`, icon: Activity, color:'#34d399', sub:'da turma geral' },
             { label:'Alunos em Risco', value: emRisco, icon: AlertTriangle, color:'#f87171', sub:'abaixo de 75%' },
             { label:'Total de Presenças', value: totalPresencas, icon: CheckCircle2, color:'#60a5fa', sub:'registradas' },
           ].map(({ label, value, icon: Icon, color, sub }) => (
-            <div key={label} className="metric-card" style={{ opacity:1 }}>
+            <div key={label} className="metric-card" style={{ opacity:1, background:'rgba(139,92,246,0.06)', borderColor:'rgba(139,92,246,0.2)' }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
                 <p style={{ fontSize:12, fontWeight:600, color:'rgba(148,163,184,0.7)', textTransform:'uppercase', letterSpacing:1 }}>{label}</p>
                 <div style={{ background:`${color}20`, padding:8, borderRadius:10 }}>
@@ -1127,13 +1167,13 @@ function RelatoriosScreen() {
         </div>
 
         {/* ─── MAIN GRID: TABLE + CHARTS ─── */}
-        <div className="animate-assemble" style={{ display:'grid', gridTemplateColumns:'1fr 300px', gap:20, marginBottom:28 }}>
+        <div className="animate-assemble" style={{ display:'grid', gridTemplateColumns:'1fr 320px', gap:24, marginBottom:32 }}>
 
           {/* Student Table */}
-          <div className="cyber-card" style={{ padding:0, overflow:'hidden' }}>
-            <div style={{ padding:'18px 24px', borderBottom:'1px solid rgba(139,92,246,0.15)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div className="cyber-card" style={{ padding:0, overflow:'hidden', background:'rgba(139,92,246,0.06)', borderColor:'rgba(139,92,246,0.2)' }}>
+            <div style={{ padding:'20px 24px', borderBottom:'1px solid rgba(139,92,246,0.15)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
               <h3 style={{ fontFamily:'Space Grotesk, sans-serif', fontWeight:600, color:'#e2e8f0', fontSize:15 }}>Lista de Alunos</h3>
-              <span style={{ fontSize:11, padding:'4px 12px', borderRadius:20, background:'rgba(139,92,246,0.15)', color:'#a78bfa', fontWeight:600, border:'1px solid rgba(139,92,246,0.25)' }}>{MOCK_ALUNOS.length} alunos</span>
+              <button style={{ fontSize:11, padding:'6px 14px', borderRadius:20, background:'rgba(139,92,246,0.15)', color:'#c4b5fd', fontWeight:600, border:'1px solid rgba(139,92,246,0.3)', cursor:'pointer' }}>Ver todos</button>
             </div>
             {/* Table header */}
             <div style={{ display:'grid', gridTemplateColumns:'1fr 60px 140px 60px', gap:12, padding:'10px 24px', background:'rgba(255,255,255,0.02)', borderBottom:'1px solid rgba(139,92,246,0.08)', fontSize:11, fontWeight:700, color:'rgba(148,163,184,0.5)', textTransform:'uppercase', letterSpacing:0.8 }}>
@@ -1268,10 +1308,24 @@ export default function App() {
         { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out', delay: 0.15 }
       );
     }
+    // Apply mount class for CSS fallback animations
+    if (contentRef.current) {
+      contentRef.current.classList.add('mount-assemble');
+      setTimeout(() => { contentRef.current && contentRef.current.classList.remove('mount-assemble'); }, 800);
+    }
+    // GSAP: AI button slide-in (simula saída lateral)
+    setTimeout(() => {
+      const fab = document.querySelector('.fab-ai');
+      const toggle = document.querySelector('.desktop-ai-toggle');
+      if (fab) gsap.fromTo(fab, { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out', delay: 0.15 });
+      if (toggle) gsap.fromTo(toggle, { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out', delay: 0.2 });
+    }, 300);
   }, []);
 
   const handleScreenChange = (id) => {
     if (!contentRef.current || id === activeScreen) return;
+    // trigger CSS mount helpers for new screen
+    contentRef.current.classList.add('mount-assemble');
     gsap.to(contentRef.current, {
       opacity: 0, y: 16, duration: 0.18, ease: 'power2.in',
       onComplete: () => {
@@ -1280,6 +1334,7 @@ export default function App() {
           { opacity: 0, y: 16 },
           { opacity: 1, y: 0, duration: 0.3, ease: 'power3.out' }
         );
+        setTimeout(() => { contentRef.current && contentRef.current.classList.remove('mount-assemble'); }, 600);
       }
     });
     if (window.innerWidth < 768) setIsSidebarOpen(false);
@@ -1303,10 +1358,9 @@ export default function App() {
     <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#07060f' }}>
 
       {/* Mobile overlay */}
-      {isSidebarOpen && (
-        <div style={{ display:'none' }} className="md-hidden"
-          onClick={() => setIsSidebarOpen(false)}
-          id="mobile-overlay"/>
+      {isSidebarOpen && window.innerWidth < 768 && (
+        <div onClick={() => setIsSidebarOpen(false)}
+          style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:40 }}/>
       )}
 
       {/* ── SIDEBAR ── */}
@@ -1407,7 +1461,7 @@ export default function App() {
         </header>
 
         {/* Content */}
-        <div ref={contentRef} style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+        <div ref={contentRef} style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column', minHeight:0 }}>
           {activeScreen === 'diario'     && <DiarioScreen userEmail={userEmail}/>}
           {activeScreen === 'gerar'      && <GerarRelatoriosScreen userEmail={userEmail}/>}
           {activeScreen === 'turmas'     && <TurmasScreen userEmail={userEmail}/>}
