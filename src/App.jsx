@@ -181,37 +181,40 @@ export const GlobalChatbot = ({ isOpen, onClose, isMobile }) => {
     <>
       {isOpen && isMobile && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:99 }} onClick={onClose} />}
       <div className={`chatbot-sidebar ${isOpen ? 'open' : ''}`}>
-        <div style={{ padding: '20px', borderBottom: '1px solid rgba(139,92,246,0.15)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <div style={{ background:'linear-gradient(135deg,rgba(139,92,246,0.2),rgba(124,58,237,0.1))', padding:8, borderRadius:10 }}>
-              <Brain style={{ width:18, height:18, color:'#a78bfa' }}/>
+        <div style={{ padding: '20px', borderBottom: '1px solid rgba(139,92,246,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background:'rgba(139,92,246,0.04)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <div style={{ background:'linear-gradient(135deg,#8b5cf6,#7c3aed)', padding:10, borderRadius:12, boxShadow:'0 0 12px rgba(139,92,246,0.4)' }}>
+              <Brain style={{ width:18, height:18, color:'white' }}  className="robot-pulse"/>
             </div>
-            <h3 style={{ fontWeight: 'bold', color: 'white' }}>IA Global</h3>
+            <div>
+              <h3 style={{ fontWeight: '700', color: '#e2e8f0', fontSize:15, margin:0 }}>IA Global</h3>
+              <p style={{ fontSize:11, color:'rgba(139,92,246,0.6)', margin:'2px 0 0 0' }}>Assistente Brasil.IA</p>
+            </div>
           </div>
-          <button onClick={onClose} style={{ background:'transparent', border:'none', color:'white', cursor:'pointer' }}><X /></button>
+          <button onClick={onClose} style={{ background:'transparent', border:'none', color:'rgba(139,92,246,0.6)', cursor:'pointer', padding:4, display:'flex' }}><X size={20}/></button>
         </div>
         
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {chatMessages.map((msg, idx) => (
-            <div key={idx} style={{ display:'flex', flexDirection: msg.role==='user' ? 'row-reverse' : 'row', alignItems:'flex-start', gap:10 }}>
+            <div key={idx} style={{ display:'flex', flexDirection: msg.role==='user' ? 'row-reverse' : 'row', alignItems:'flex-end', gap:8 }}>
               {msg.role === 'ai' && (
-                <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,rgba(139,92,246,0.3),rgba(124,58,237,0.2))', border:'1px solid rgba(139,92,246,0.3)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                  <Bot style={{ width:14, height:14, color:'#a78bfa' }}/>
+                <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#8b5cf6,#7c3aed)', border:'2px solid rgba(139,92,246,0.4)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 0 8px rgba(139,92,246,0.3)' }}>
+                  <Bot style={{ width:14, height:14, color:'white' }}/>
                 </div>
               )}
-              <div className={msg.role === 'ai' ? 'chat-bubble-ai' : 'chat-bubble-user'} style={{ whiteSpace:'pre-wrap' }}>
-                <p style={{ fontSize:14, color:'#e2e8f0', lineHeight:1.6, margin:0 }}>{msg.text}</p>
+              <div className={msg.role === 'ai' ? 'chat-bubble-ai' : 'chat-bubble-user'} style={{ whiteSpace:'pre-wrap', maxWidth:'280px' }}>
+                <p style={{ fontSize:13, color:'#e2e8f0', lineHeight:1.5, margin:0 }}>{msg.text}</p>
               </div>
             </div>
           ))}
           {isChatLoading && (
-            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-              <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,rgba(139,92,246,0.3),rgba(124,58,237,0.2))', border:'1px solid rgba(139,92,246,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <Bot style={{ width:14, height:14, color:'#a78bfa' }}/>
+            <div style={{ display:'flex', alignItems:'flex-end', gap:8 }}>
+              <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#8b5cf6,#7c3aed)', border:'2px solid rgba(139,92,246,0.4)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 8px rgba(139,92,246,0.3)' }}>
+                <Bot style={{ width:14, height:14, color:'white' }}/>
               </div>
-              <div className="chat-bubble-ai" style={{ display:'flex', gap:4, alignItems:'center' }}>
+              <div className="chat-bubble-ai" style={{ display:'flex', gap:3, alignItems:'center', padding:'8px 12px' }}>
                 {[0,1,2].map(i => (
-                  <div key={i} style={{ width:7, height:7, borderRadius:'50%', background:'#8b5cf6', animation:`blink 1.2s ${i*0.2}s ease-in-out infinite` }}/>
+                  <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#c4b5fd', animation:`blink 1.2s ${i*0.2}s ease-in-out infinite` }}/>
                 ))}
               </div>
             </div>
@@ -219,7 +222,7 @@ export const GlobalChatbot = ({ isOpen, onClose, isMobile }) => {
           <div ref={chatEndRef} />
         </div>
         
-        <div style={{ padding: '16px', borderTop: '1px solid rgba(139,92,246,0.15)' }}>
+        <div style={{ padding: '16px', borderTop: '1px solid rgba(139,92,246,0.2)', background:'rgba(139,92,246,0.03)' }}>
           <div style={{ display: 'flex', gap: 8 }}>
             <input 
               type="text" 
@@ -227,10 +230,11 @@ export const GlobalChatbot = ({ isOpen, onClose, isMobile }) => {
               onChange={e => setChatInput(e.target.value)} 
               onKeyDown={e => e.key === 'Enter' && handleChatSend()}
               placeholder="Digite sua dúvida..." 
-              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #4c1d95', background: '#1a1030', color: 'white', outline:'none' }}
+              style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(139,92,246,0.25)', background: '#0f0a1c', color: '#e2e8f0', outline:'none', fontSize:13, fontWeight:500 }}
+              className="cyber-input"
             />
-            <button onClick={handleChatSend} style={{ padding:'10px', borderRadius:'8px', background:'#8b5cf6', border:'none', color:'white', cursor:'pointer' }}>
-              <Send size={18} />
+            <button onClick={handleChatSend} style={{ padding:'12px 14px', borderRadius:'10px', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', border:'none', color:'white', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 12px rgba(139,92,246,0.3)' }}>
+              <Send size={16} />
             </button>
           </div>
         </div>
@@ -1069,8 +1073,8 @@ function RelatoriosScreen() {
   };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto cyber-grid-bg" style={{ background:'#07060f' }}>
-      <div style={{ padding:'28px 24px 80px', maxWidth:1280, margin:'0 auto' }}>
+    <main ref={containerRef} className="flex-1 overflow-y-auto cyber-grid-bg" style={{ background:'#07060f', display:'flex', flexDirection:'column' }}>
+      <div style={{ padding:'28px 24px 80px', maxWidth:1280, margin:'0 auto', width:'100%', flex:1, overflowY:'auto' }}>
 
         {/* ─── PAGE HEADER ─── */}
         <div className="animate-assemble" style={{ marginBottom:32, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:24 }}>

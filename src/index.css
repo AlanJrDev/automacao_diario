@@ -191,12 +191,12 @@ html, body, #root {
 .heat-cell:hover { transform: scale(1.4); z-index: 2; position: relative; }
 
 /* ===== SCROLLBARS (thin cyber) ===== */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(139,92,246,0.4); border-radius: 999px;
+  background: rgba(139,92,246,0.3); border-radius: 999px;
 }
-::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.7); }
+::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.6); }
 
 /* ===== INPUTS CYBER ===== */
 .cyber-input {
@@ -303,10 +303,10 @@ html, body, #root {
 /* Global Chatbot Sidebar */
 .chatbot-sidebar {
   position: fixed; top: 0; right: 0; bottom: 0; width: 380px; max-width: 100vw;
-  background: #0f0a1c; border-left: 1px solid rgba(139,92,246,0.15);
-  box-shadow: -4px 0 24px rgba(0,0,0,0.4);
+  background: linear-gradient(135deg, #0f0a1c, #1a1030); border-left: 2px solid rgba(139,92,246,0.25);
+  box-shadow: -8px 0 32px rgba(139,92,246,0.15);
   z-index: 100; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex; flexDirection: column;
+  display: flex; flex-direction: column;
 }
 .chatbot-sidebar.open { transform: translateX(0); }
 
