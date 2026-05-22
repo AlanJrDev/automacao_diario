@@ -1073,8 +1073,8 @@ function RelatoriosScreen() {
   };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto cyber-grid-bg" style={{ background:'#07060f', display:'flex', flexDirection:'column' }}>
-      <div style={{ padding:'28px 24px 80px', maxWidth:1280, margin:'0 auto', width:'100%', flex:1, overflowY:'auto' }}>
+    <main ref={containerRef} className="cyber-grid-bg" style={{ background:'#07060f', height:'100%', overflowY:'auto', display:'block' }}>
+      <div style={{ padding:'28px 24px 80px', maxWidth:1280, margin:'0 auto', width:'100%' }}>
 
         {/* ─── PAGE HEADER ─── */}
         <div className="animate-assemble" style={{ marginBottom:32, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:24 }}>
