@@ -337,12 +337,11 @@ function DiarioScreen({ userEmail }) {
         </div>
 
         {/* Planilha ID */}
-        <div className="cyber-card animate-assemble" style={{ padding:'10px 16px', display:'flex', alignItems:'center', gap:10 }}>
-          <Database style={{ width:16, height:16, color:'#a78bfa', flexShrink:0 }} />
-          <input type="text" value={planilhaId} onChange={e => setPlanilhaId(e.target.value)}
-            placeholder="ID da Planilha Google Sheets..."
-            style={{ flex:1, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(139,92,246,0.25)', borderRadius:8, padding:'6px 12px', color:'#e2e8f0', fontFamily:'monospace', fontSize:12, outline:'none' }}
-            className="cyber-input" />
+        <div className="cyber-card animate-assemble" style={{ padding:'10px 16px' }}>
+          <div className="pill-input">
+            <Database style={{ width:16, height:16, color:'#a78bfa', flexShrink:0 }} />
+            <input type="text" value={planilhaId} onChange={e => setPlanilhaId(e.target.value)} placeholder="13wot0sKShqy..." className="cyber-input" style={{ fontSize:13 }} />
+          </div>
         </div>
 
         {/* Textarea */}
@@ -1079,26 +1078,34 @@ function RelatoriosScreen({ isMobile }) {
             <p style={{ color:'rgba(148,163,184,0.6)', marginTop:6, fontSize:13 }}>Visão geral da frequência e assiduidade dos alunos no período atual.</p>
           </div>
           <div className="flex-responsive" style={{ alignItems:'center', justifyContent:'flex-end' }}>
-            <select value={cidadeFilter} onChange={e => setCidadeFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:150, flex: isMobile ? '1 1 100%' : '0 1 auto' }}>
-              <option value="">Todas as Cidades</option>
-              {MOCK_CIDADES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <select value={etapaFilter} onChange={e => setEtapaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140, flex: isMobile ? '1 1 100%' : '0 1 auto' }}>
-              <option value="">Todas as Etapas</option>
-              <option value="1">1ª Etapa (Janeiro)</option>
-              <option value="2">2ª Etapa (Fevereiro)</option>
-              <option value="3">3ª Etapa (Março)</option>
-              <option value="4">4ª Etapa (Abril)</option>
-              <option value="5">5ª Etapa (Maio)</option>
-              <option value="6">6ª Etapa (Junho)</option>
-            </select>
-            <select value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140, flex: isMobile ? '1 1 100%' : '0 1 auto' }}>
-              <option value="">Todas as Matérias</option>
-              {MOCK_TURMAS.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
+            <div style={{ display:'flex', gap:12, alignItems:'center', flexWrap:'wrap' }}>
+              <div style={{ minWidth:150 }}>
+                <div style={{ fontSize:11, color:'rgba(148,163,184,0.5)', marginBottom:6, fontWeight:700, textTransform:'uppercase', letterSpacing:1 }}>Cidades</div>
+                <div className="filter-chips">
+                  <button className={`chip ${cidadeFilter === '' ? 'active' : ''}`} onClick={() => setCidadeFilter('')}>Todas as Cidades</button>
+                  {MOCK_CIDADES.map(c => <button key={c} className={`chip ${cidadeFilter===c?'active':''}`} onClick={() => setCidadeFilter(c)}>{c}</button>)}
+                </div>
+              </div>
+              <div style={{ minWidth:180 }}>
+                <div style={{ fontSize:11, color:'rgba(148,163,184,0.5)', marginBottom:6, fontWeight:700, textTransform:'uppercase', letterSpacing:1 }}>Etapas</div>
+                <div className="filter-chips">
+                  <button className={`chip ${etapaFilter === '' ? 'active' : ''}`} onClick={() => setEtapaFilter('')}>Todas as Etapas</button>
+                  <button className={`chip ${etapaFilter === '1' ? 'active' : ''}`} onClick={() => setEtapaFilter('1')}>1ª (Jan)</button>
+                  <button className={`chip ${etapaFilter === '2' ? 'active' : ''}`} onClick={() => setEtapaFilter('2')}>2ª (Fev)</button>
+                  <button className={`chip ${etapaFilter === '3' ? 'active' : ''}`} onClick={() => setEtapaFilter('3')}>3ª (Mar)</button>
+                  <button className={`chip ${etapaFilter === '4' ? 'active' : ''}`} onClick={() => setEtapaFilter('4')}>4ª (Abr)</button>
+                  <button className={`chip ${etapaFilter === '5' ? 'active' : ''}`} onClick={() => setEtapaFilter('5')}>5ª (Mai)</button>
+                  <button className={`chip ${etapaFilter === '6' ? 'active' : ''}`} onClick={() => setEtapaFilter('6')}>6ª (Jun)</button>
+                </div>
+              </div>
+              <div style={{ minWidth:160 }}>
+                <div style={{ fontSize:11, color:'rgba(148,163,184,0.5)', marginBottom:6, fontWeight:700, textTransform:'uppercase', letterSpacing:1 }}>Matérias</div>
+                <div className="filter-chips">
+                  <button className={`chip ${turmaFilter === '' ? 'active' : ''}`} onClick={() => setTurmaFilter('')}>Todas as Matérias</button>
+                  {MOCK_TURMAS.map(t => <button key={t} className={`chip ${turmaFilter===t?'active':''}`} onClick={() => setTurmaFilter(t)}>{t}</button>)}
+                </div>
+              </div>
+            </div>
             <button onClick={() => loadPeriod(selectedPeriod)} style={{ padding:'10px 20px', borderRadius:10, border:'none', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700, boxShadow:'0 4px 12px rgba(139,92,246,0.3)', flex: isMobile ? '1 1 100%' : '0 1 auto', justifyContent:'center' }}>
               <RefreshCw style={{ width:14, height:14 }}/>Atualizar
             </button>

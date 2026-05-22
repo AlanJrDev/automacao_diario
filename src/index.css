@@ -525,6 +525,44 @@ html, body, #root {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ===== FILTER CHIPS & PILLS ===== */
+.filter-chips {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 0;
+}
+.filter-chips .chip {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(139,92,246,0.12);
+  background: rgba(255,255,255,0.02);
+  color: var(--cyber-text-muted);
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.filter-chips .chip.active {
+  background: linear-gradient(135deg,#8b5cf6,#7c3aed);
+  color: white;
+  border-color: rgba(139,92,246,0.28);
+  box-shadow: 0 6px 18px rgba(124,58,237,0.12);
+}
+
+.pill-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(139,92,246,0.18);
+  background: rgba(255,255,255,0.02);
+}
+.pill-input input { background: transparent; border: none; color: var(--cyber-text); outline: none; font-family: monospace; }
+
+
 /* Dashboard grid responsivo */
 @media (max-width: 640px) {
   .dashboard-grid {
