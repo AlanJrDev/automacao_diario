@@ -1011,21 +1011,57 @@ function RelatoriosScreen() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0); // O topo é exibido primeiro!
+    // Determine current period key (YYYY-MM)
+    const now = new Date();
+    const period = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    window.scrollTo(0, 0);
 
-    // Fetch de Dados Reais do Sheets (Simulação usando o APPS_SCRIPT_URL existente)
-    // Quando o usuário implementar o doGet() no .gs, isso puxará os dados reais.
-    fetch(APPS_SCRIPT_URL + '?acao=listar')
+    // migrate previous cached current data to archive if period changed
+    try {
+      const savedPeriod = localStorage.getItem('relatorios_current_period');
+      const savedDataKey = 'relatorios_cache_' + savedPeriod;
+      if (savedPeriod && savedPeriod !== period) {
+        const savedJson = localStorage.getItem(savedDataKey);
+        if (savedJson) {
+          const archiveRaw = localStorage.getItem('relatorios_archive');
+          const archive = archiveRaw ? JSON.parse(archiveRaw) : [];
+          // push archive entry if not exists
+          if (!archive.find(a => a.period === savedPeriod)) {
+            archive.push({ period: savedPeriod, storedAt: new Date().toISOString(), data: JSON.parse(savedJson) });
+            localStorage.setItem('relatorios_archive', JSON.stringify(archive));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('archive error', err);
+    }
+
+    // If we have cached data for current period, use it
+    const cacheKey = 'relatorios_cache_' + period;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try { setRealData(JSON.parse(cached)); } catch(e) { setRealData(MOCK_ALUNOS); }
+      setIsLoadingData(false);
+      setTimeout(() => setProgressLoaded(true), 300);
+      // ensure marker
+      localStorage.setItem('relatorios_current_period', period);
+      return;
+    }
+
+    // Otherwise fetch from server for specific period
+    fetch(`${APPS_SCRIPT_URL}?acao=listar&period=${period}`)
       .then(r => r.json())
       .then(d => {
         if (d.status === 'success' && d.data) {
           setRealData(d.data);
+          try { localStorage.setItem(cacheKey, JSON.stringify(d.data)); localStorage.setItem('relatorios_current_period', period); } catch(e){}
         } else {
-          setRealData(MOCK_ALUNOS); // Fallback caso não tenha doGet
+          setRealData(MOCK_ALUNOS);
         }
       })
       .catch(e => {
-        setRealData(MOCK_ALUNOS); // Fallback
+        console.warn('fetch relatorios failed', e);
+        setRealData(MOCK_ALUNOS);
       })
       .finally(() => {
         setIsLoadingData(false);
