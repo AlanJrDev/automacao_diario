@@ -329,7 +329,7 @@ function DiarioScreen({ userEmail }) {
   };
 
   return (
-    <main ref={containerRef} className="flex-1 p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0, overflowY:'auto' }}>
+    <main ref={containerRef} className="flex-1 p-6 md:p-10 pb-32 cyber-grid-bg overflow-safe" style={{ background:'#07060f', minHeight:0, touchAction: 'pan-y' }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }} className="space-y-6">
         <div className="animate-assemble">
           <h2 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize: '1.875rem', fontWeight: 800, background: 'linear-gradient(135deg, #c4b5fd 0%, #ffffff 60%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>Lançamento Inteligente</h2>
@@ -536,7 +536,7 @@ Período: 01/05/2026 a 31/05/2026`);
   };
 
   return (
-    <main ref={containerRef} className="flex-1 p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0, overflowY:'auto' }}>
+    <main ref={containerRef} className="flex-1 p-6 md:p-10 pb-32 cyber-grid-bg overflow-safe" style={{ background:'#07060f', minHeight:0, touchAction: 'pan-y' }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }} className="space-y-6">
         
         {/* Header */}
@@ -732,7 +732,7 @@ function TurmasScreen({ userEmail, isMobile }) {
   const labelStyle = { fontSize:12, fontWeight:600, color:'rgba(148,163,184,0.7)', textTransform:'uppercase', letterSpacing:0.8, marginBottom:6, display:'block' };
 
   return (
-    <main ref={containerRef} className="flex-1 p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0, overflowY:'auto' }}>
+    <main ref={containerRef} className="flex-1 p-6 md:p-10 pb-32 cyber-grid-bg overflow-safe" style={{ background:'#07060f', minHeight:0, touchAction: 'pan-y' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
 
         {/* Header */}
@@ -1057,7 +1057,7 @@ function RelatoriosScreen({ isMobile }) {
   };
 
   return (
-    <main ref={containerRef} className="cyber-grid-bg" style={{ background:'#07060f', flex:1, minHeight:0, overflowY:'auto' }}>
+    <main ref={containerRef} className="cyber-grid-bg overflow-safe" style={{ background:'#07060f', flex:1, minHeight:0, touchAction: 'pan-y' }}>
       <div style={{ padding: isMobile ? '20px 16px 80px' : '28px 24px 80px', maxWidth:1280, margin:'0 auto', width:'100%' }}>
 
         {/* ─── PAGE HEADER ─── */}

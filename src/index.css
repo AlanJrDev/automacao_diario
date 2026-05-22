@@ -520,6 +520,9 @@ html, body, #root {
 .overflow-safe {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Dashboard grid responsivo */
