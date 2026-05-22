@@ -1,0 +1,20 @@
+# .gniignore — arquivos q IA pode ignorar p/ economizar tokens
+# Funciona como dica pro modelo, nao como regra rigida
+
+node_modules/
+dist/
+.git/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+package-lock.json
+*.map
+eslint.config.js
+README.md
+update_app.js
+*.log
+.DS_Store
+Thumbs.db
