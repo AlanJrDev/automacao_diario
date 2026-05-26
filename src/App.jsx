@@ -24,10 +24,11 @@ const APPS_SCRIPT_URL    = 'https://script.google.com/macros/s/AKfycby_tqud-aLgM
 const GERADOR_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby05vGuyjhflrARwS4uXd65gmjCLLY34xcH_J0liGl9wZWRvjkERAEgfyingu16r5cmqA/exec';
 
 // ============================================================
-// MOCK DATA — Dashboard de Faltas
+// MOCK DATA & CONFIG
 // ============================================================
+const ALL_CIDADES = ['Planaltina', 'Sobradinho', 'Gama', 'Taguatinga', 'Ceilândia'];
+const ETAPAS_MAP = { '4': 'maio', '5': 'junho', '6': 'julho', '7': 'agosto', '8': 'setembro' };
 const MOCK_TURMAS = ['Informática Básica', 'Criando com a IA', 'C# para Iniciantes', 'IA e o Futuro do Trabalho', 'Estética de Jogo'];
-const MOCK_CIDADES = ['Planaltina', 'Sobradinho', 'Gama', 'Taguatinga', 'Ceilândia'];
 const MOCK_INSTRUTORES = [
   { nome: 'João Silva',    cidade: 'Planaltina', curso: 'Informática Básica' },
   { nome: 'Maria Santos',  cidade: 'Sobradinho',  curso: 'Criando com a IA' },
@@ -329,7 +330,7 @@ function DiarioScreen({ userEmail }) {
   };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0 }}>
+    <main ref={containerRef} className="cyber-grid-bg" style={{ background:'#07060f', flex:1, overflowY:'auto', minHeight:0, padding:'24px 40px 128px' }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }} className="space-y-6">
         <div className="animate-assemble">
           <h2 style={{ fontFamily:'Space Grotesk, sans-serif', fontSize: '1.875rem', fontWeight: 800, background: 'linear-gradient(135deg, #c4b5fd 0%, #ffffff 60%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>Lançamento Inteligente</h2>
@@ -537,7 +538,7 @@ Período: 01/05/2026 a 31/05/2026`);
   };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0 }}>
+    <main ref={containerRef} className="cyber-grid-bg" style={{ background:'#07060f', flex:1, overflowY:'auto', minHeight:0, padding:'24px 40px 128px' }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }} className="space-y-6">
         
         {/* Header */}
@@ -728,7 +729,7 @@ function TurmasScreen({ userEmail }) {
   const labelStyle = { fontSize:12, fontWeight:600, color:'rgba(148,163,184,0.7)', textTransform:'uppercase', letterSpacing:0.8, marginBottom:6, display:'block' };
 
   return (
-    <main ref={containerRef} className="flex-1 overflow-y-auto p-6 md:p-10 pb-32 cyber-grid-bg" style={{ background:'#07060f', minHeight:0 }}>
+    <main ref={containerRef} className="cyber-grid-bg" style={{ background:'#07060f', flex:1, overflowY:'auto', minHeight:0, padding:'24px 40px 128px' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         
         {/* Header */}
@@ -1011,6 +1012,10 @@ function RelatoriosScreen() {
   const [showArchive, setShowArchive] = useState(false);
   const [archiveList, setArchiveList] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [currentSheetName, setCurrentSheetName] = useState('');
+  
+  const [metadados, setMetadados] = useState([]);
+  const [isLoadingMeta, setIsLoadingMeta] = useState(true);
   
   const containerRef = useRef(null);
 
@@ -1021,7 +1026,7 @@ function RelatoriosScreen() {
     } catch { return []; }
   };
 
-  const loadPeriod = (period) => {
+  const loadPeriod = (period, materiaSel = turmaFilter, pId = null) => {
     const now = new Date();
     const currentPeriod = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     const periodLabel = period || currentPeriod;
@@ -1029,7 +1034,7 @@ function RelatoriosScreen() {
     setIsLoadingData(true);
     setProgressLoaded(false);
 
-    const cacheKey = 'relatorios_cache_' + periodLabel;
+    const cacheKey = `relatorios_cache_${periodLabel}_${materiaSel}_${pId || ''}`;
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
       try { setRealData(JSON.parse(cached)); setDataSource('cache'); } catch { setRealData(MOCK_ALUNOS); setDataSource('mock'); }
@@ -1039,12 +1044,17 @@ function RelatoriosScreen() {
       return;
     }
 
-    fetch(`${APPS_SCRIPT_URL}?acao=listar&period=${periodLabel}`)
+    const queryId = pId ? `&planilhaId=${pId}` : '';
+    fetch(`${APPS_SCRIPT_URL}?acao=listar&period=${periodLabel}&materia=${encodeURIComponent(materiaSel)}${queryId}`)
       .then(r => r.json())
       .then(d => {
         if (d.status === 'success' && d.data) {
           setRealData(d.data);
           setDataSource('live');
+          if (d.sheetName) {
+             setCurrentSheetName(d.sheetName);
+             if (d.sheetName.toLowerCase().includes('gama') && !cidadeFilter) setCidadeFilter('Gama');
+          }
           try { localStorage.setItem(cacheKey, JSON.stringify(d.data)); } catch(e){}
           if (!period) localStorage.setItem('relatorios_current_period', periodLabel);
         } else {
@@ -1082,8 +1092,67 @@ function RelatoriosScreen() {
     }
 
     setArchiveList(loadArchive());
-    loadPeriod(null);
   }, []);
+
+  // Fetch metadados (todas planilhas da pasta, para descobrir cidades e turmas)
+  useEffect(() => {
+    setIsLoadingMeta(true);
+    fetch(`${APPS_SCRIPT_URL}?acao=listar_metadados`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'success') {
+          setMetadados(d.planilhas);
+        } else {
+          throw new Error('Erro na API');
+        }
+      })
+      .catch(err => {
+        console.warn('Usando Mock Local pois o Apps Script ainda não foi atualizado/deployado:', err);
+        setMetadados([
+          { 
+            id: '13wot0sKShqyRg6NVxnYBahWIFOzA7SNgoeNozITZaB0', 
+            nome: 'Carreta 1 - Gama - Maio', 
+            materias: [
+              'C# PARA INICIANTES. PRIMEIROS P', 
+              'CRIANDO COM A IA', 
+              '2 ESTÉTICA DE JOGO DA TEORIA À P',
+              '2 INFORMÁTICA BÁSICA',
+              'IA E O FUTURO DO TRABALHO'
+            ] 
+          },
+          { id: 'mock2', nome: 'Carreta 2 - Sobradinho - Maio', materias: ['C# PARA INICIANTES. PRIMEIROS P', 'IA E O FUTURO DO TRABALHO'] },
+          { id: 'mock3', nome: 'Carreta 1 - Gama - Junho', materias: ['2 INFORMÁTICA BÁSICA'] }
+        ]);
+      })
+      .finally(() => setIsLoadingMeta(false));
+  }, []);
+
+  // Calcula cidades disponíveis com base nos nomes das planilhas
+  const cidadesDisponiveis = Array.from(new Set(
+    metadados.flatMap(p => ALL_CIDADES.filter(c => p.nome.toLowerCase().includes(c.toLowerCase())))
+  ));
+
+  // Encontra a planilha correspondente à Cidade e Etapa selecionadas
+  const planilhaSelecionada = React.useMemo(() => {
+    if (!cidadeFilter || !etapaFilter) return null;
+    const mes = ETAPAS_MAP[etapaFilter];
+    return metadados.find(p => p.nome.toLowerCase().includes(cidadeFilter.toLowerCase()) && p.nome.toLowerCase().includes(mes));
+  }, [cidadeFilter, etapaFilter, metadados]);
+
+  const materiasDisponiveis = planilhaSelecionada ? planilhaSelecionada.materias : [];
+
+  // Limpa a matéria e oculta dashboard se cidade ou etapa mudarem
+  useEffect(() => {
+    setTurmaFilter('');
+    setIsLoadingData(false);
+  }, [cidadeFilter, etapaFilter]);
+
+  // Carrega os dados quando a materia final for selecionada
+  useEffect(() => {
+    if (turmaFilter && planilhaSelecionada) {
+      loadPeriod(selectedPeriod, turmaFilter, planilhaSelecionada.id);
+    }
+  }, [turmaFilter]);
 
   // GSAP: mount animation for staggered elements
   useEffect(() => {
@@ -1098,15 +1167,61 @@ function RelatoriosScreen() {
   const alunosFiltrados = realData.filter(a => {
     let match = true;
     if (cidadeFilter && a.cidade && a.cidade !== cidadeFilter) match = false;
-    // O filtro de etapa/turma entraria aqui quando o realData tiver esses campos
     return match;
   });
 
+  // Lógica Dinâmica para Datas (ignora faltas futuras)
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  let dateKeys = [];
+  if (dataSource !== 'mock' && alunosFiltrados.length > 0) {
+    const keys = Object.keys(alunosFiltrados[0]);
+    dateKeys = keys.filter(k => {
+      if (k.includes('/')) {
+        const p = k.split('/');
+        if (p.length === 3) {
+          const d = new Date(parseInt(p[2]), parseInt(p[0]) - 1, parseInt(p[1]));
+          return !isNaN(d.getTime()) && d <= today;
+        }
+      }
+      return false;
+    });
+    dateKeys.sort((a, b) => {
+      const pA = a.split('/');
+      const pB = b.split('/');
+      return new Date(pA[2], pA[0]-1, pA[1]) - new Date(pB[2], pB[0]-1, pB[1]);
+    });
+  }
+
+  const dynamicHeatmap = dataSource === 'mock' ? HEATMAP_DATA : dateKeys.map(k => {
+    let faltas = 0;
+    let presencas = 0;
+    alunosFiltrados.forEach(aluno => {
+       const val = (aluno[k] || '').toString().trim().toUpperCase();
+       if (val === 'F') faltas++;
+       else if (val !== '') presencas++; 
+    });
+    const p = k.split('/');
+    return { data: `${String(p[1]).padStart(2,'0')}/${String(p[0]).padStart(2,'0')}`, faltas, presencas };
+  });
+
+  const getAssidReal = (aluno) => {
+    if (dataSource === 'mock') return getAssiduidade(aluno);
+    if (dateKeys.length === 0) return 100;
+    let f = 0;
+    dateKeys.forEach(k => {
+      const val = (aluno[k] || '').toString().trim().toUpperCase();
+      if (val === 'F') f++;
+    });
+    return Math.round(((dateKeys.length - f) / dateKeys.length) * 100);
+  };
+
   const totalAlunos    = alunosFiltrados.length || 1;
-  const totalFaltas    = alunosFiltrados.reduce((a, b) => a + b.faltas, 0);
-  const totalPresencas = alunosFiltrados.reduce((a, b) => a + (b.totalAulas - b.faltas), 0);
-  const mediaAssid     = Math.round(alunosFiltrados.reduce((a, b) => a + getAssiduidade(b), 0) / totalAlunos);
-  const emRisco        = alunosFiltrados.filter(a => getAssiduidade(a) < 75).length;
+  const totalFaltas    = dataSource === 'mock' ? alunosFiltrados.reduce((a, b) => a + b.faltas, 0) : dynamicHeatmap.reduce((acc, curr) => acc + curr.faltas, 0);
+  const totalPresencas = dataSource === 'mock' ? alunosFiltrados.reduce((a, b) => a + (b.totalAulas - b.faltas), 0) : dynamicHeatmap.reduce((acc, curr) => acc + curr.presencas, 0);
+  const mediaAssid     = Math.round(alunosFiltrados.reduce((a, b) => a + getAssidReal(b), 0) / totalAlunos) || 100;
+  const emRisco        = alunosFiltrados.filter(a => getAssidReal(a) < 75).length;
 
   const donutData = [
     { name: 'Manhã',   value: alunosFiltrados.filter(a => a.turno === 'Manhã').length,  color:'#8b5cf6' },
@@ -1147,24 +1262,25 @@ function RelatoriosScreen() {
             <p style={{ color:'rgba(148,163,184,0.6)', marginTop:6, fontSize:13 }}>Visão geral da frequência e assiduidade dos alunos no período atual.</p>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap', justifyContent:'flex-end' }}>
-            <select value={cidadeFilter} onChange={e => setCidadeFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:150 }}>
-              <option value="">Todas as Cidades</option>
-              {MOCK_CIDADES.map(c => <option key={c} value={c}>{c}</option>)}
+            <select value={cidadeFilter} onChange={e => setCidadeFilter(e.target.value)} disabled={isLoadingMeta}
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:150, opacity: isLoadingMeta ? 0.5 : 1 }}>
+              <option value="">{isLoadingMeta ? 'Carregando...' : 'Todas as Cidades'}</option>
+              {cidadesDisponiveis.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            <select value={etapaFilter} onChange={e => setEtapaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140 }}>
+            <select value={etapaFilter} onChange={e => setEtapaFilter(e.target.value)} disabled={isLoadingMeta}
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140, opacity: isLoadingMeta ? 0.5 : 1 }}>
               <option value="">Todas as Etapas</option>
-              <option value="1">1ª Etapa (Jan/Fev)</option>
-              <option value="2">2ª Etapa (Mar/Abr)</option>
-              <option value="3">3ª Etapa (Mai/Jun)</option>
+              <option value="4">4ª Etapa (Maio)</option>
+              <option value="5">5ª Etapa (Junho)</option>
+              <option value="6">6ª Etapa (Julho)</option>
+              <option value="7">7ª Etapa (Agosto)</option>
             </select>
-            <select value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}
-              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140 }}>
-              <option value="">Todas as Matérias</option>
-              {MOCK_TURMAS.map(t => <option key={t} value={t}>{t}</option>)}
+            <select value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)} disabled={materiasDisponiveis.length === 0}
+              className="cyber-select" style={{ padding:'10px 16px', fontSize:12, minWidth:140, opacity: materiasDisponiveis.length === 0 ? 0.5 : 1 }}>
+              <option value="">{!cidadeFilter || !etapaFilter ? 'Selecione Cidade e Etapa' : materiasDisponiveis.length === 0 ? 'Sem matérias' : 'Selecione a Matéria'}</option>
+              {materiasDisponiveis.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
-            <button onClick={() => loadPeriod(selectedPeriod)} style={{ padding:'10px 20px', borderRadius:10, border:'none', background:'linear-gradient(135deg, #8b5cf6, #7c3aed)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700, boxShadow:'0 4px 12px rgba(139,92,246,0.3)' }}>
+            <button onClick={() => loadPeriod(selectedPeriod, turmaFilter, planilhaSelecionada?.id)} disabled={!turmaFilter} style={{ padding:'10px 20px', borderRadius:10, border:'none', background: turmaFilter ? 'linear-gradient(135deg, #8b5cf6, #7c3aed)' : 'rgba(255,255,255,0.05)', color: turmaFilter ? 'white' : 'rgba(148,163,184,0.3)', cursor: turmaFilter ? 'pointer' : 'not-allowed', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700, boxShadow: turmaFilter ? '0 4px 12px rgba(139,92,246,0.3)' : 'none' }}>
               <RefreshCw style={{ width:14, height:14 }}/>Atualizar
             </button>
             <button onClick={() => setShowArchive(!showArchive)} style={{ padding:'10px 20px', borderRadius:10, border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.1)', color:'#c4b5fd', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700 }}>
@@ -1173,7 +1289,20 @@ function RelatoriosScreen() {
           </div>
         </div>
 
-        {/* ─── METRIC CARDS ─── */}
+        {/* ─── EMPTY STATE IF NOT SELECTED ─── */}
+        {(!cidadeFilter || !etapaFilter || !turmaFilter) ? (
+          <div className="animate-assemble cyber-card" style={{ padding:40, textAlign:'center', display:'flex', flexDirection:'column', alignItems:'center', gap:16, borderStyle:'dashed', borderColor:'rgba(139,92,246,0.2)' }}>
+            <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(139,92,246,0.1)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <LayoutDashboard style={{ width:28, height:28, color:'#a78bfa' }}/>
+            </div>
+            <div>
+              <h3 style={{ fontSize:18, fontWeight:700, color:'#e2e8f0', margin:0 }}>Selecione os Filtros</h3>
+              <p style={{ fontSize:14, color:'rgba(148,163,184,0.6)', marginTop:6 }}>Para visualizar os dados e o dashboard, selecione uma <strong>Cidade</strong>, uma <strong>Etapa</strong> e, em seguida, a <strong>Matéria</strong> disponível.</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* ─── METRIC CARDS ─── */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:16, marginBottom:28 }} className="animate-assemble">
           {[
             { label:'Total de Alunos', value: totalAlunos, icon: Users, color:'#c4b5fd', sub:'ativos no período' },
@@ -1208,10 +1337,10 @@ function RelatoriosScreen() {
             <div style={{ display:'grid', gridTemplateColumns:'1fr 60px 140px 60px', gap:12, padding:'10px 24px', background:'rgba(255,255,255,0.02)', borderBottom:'1px solid rgba(139,92,246,0.08)', fontSize:11, fontWeight:700, color:'rgba(148,163,184,0.5)', textTransform:'uppercase', letterSpacing:0.8 }}>
               <span>Aluno</span><span>Turno</span><span>Assiduidade</span><span>Faltas</span>
             </div>
-            {MOCK_ALUNOS.map((aluno, idx) => {
-              const assid = getAssiduidade(aluno);
+            {alunosFiltrados.map((aluno, idx) => {
+              const assid = getAssidReal(aluno);
               return (
-                <div key={aluno.id} style={{ display:'grid', gridTemplateColumns:'1fr 60px 140px 60px', gap:12, padding:'14px 24px', borderBottom: idx < MOCK_ALUNOS.length-1 ? '1px solid rgba(139,92,246,0.06)' : 'none', alignItems:'center', transition:'all 0.2s', cursor:'default' }}
+                <div key={aluno.id || idx} style={{ display:'grid', gridTemplateColumns:'1fr 60px 140px 60px', gap:12, padding:'14px 24px', borderBottom: idx < alunosFiltrados.length-1 ? '1px solid rgba(139,92,246,0.06)' : 'none', alignItems:'center', transition:'all 0.2s', cursor:'default' }}
                   onMouseEnter={e => { e.currentTarget.style.background='rgba(139,92,246,0.07)'; e.currentTarget.style.borderRadius='8px'; }}
                   onMouseLeave={e => { e.currentTarget.style.background='transparent'; }}>
                   <div style={{ display:'flex', alignItems:'center', gap:10 }}>
@@ -1232,7 +1361,9 @@ function RelatoriosScreen() {
                       <div className={`progress-fill ${getProgressClass(assid)}`} style={{ width: progressLoaded ? `${assid}%` : '0%' }}/>
                     </div>
                   </div>
-                  <span style={{ textAlign:'center', fontFamily:'Space Grotesk, sans-serif', fontSize:18, fontWeight:700, color: assid < 75 ? '#f87171' : '#c4b5fd' }}>{aluno.faltas}</span>
+                  <span style={{ textAlign:'center', fontFamily:'Space Grotesk, sans-serif', fontSize:18, fontWeight:700, color: assid < 75 ? '#f87171' : '#c4b5fd' }}>
+                    {dataSource === 'mock' ? aluno.faltas : (dateKeys.length - Math.round(dateKeys.length * (assid / 100)))}
+                  </span>
                 </div>
               );
             })}
@@ -1265,7 +1396,7 @@ function RelatoriosScreen() {
             <div className="cyber-card" style={{ padding:24, flex:1 }}>
               <h3 style={{ fontFamily:'Space Grotesk, sans-serif', fontWeight:600, color:'#e2e8f0', fontSize:14, marginBottom:16 }}>Mapa de Calor — Faltas</h3>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:6 }}>
-                {HEATMAP_DATA.map(({ data, faltas }) => (
+                {dynamicHeatmap.map(({ data, faltas }) => (
                   <div key={data} className="heat-cell" title={`${data}: ${faltas} faltas`}
                     style={{ aspectRatio:'1', background: heatColor(faltas), borderRadius:4, display:'flex', alignItems:'center', justifyContent:'center', fontSize:9, color:'rgba(255,255,255,0.6)', fontWeight:600, cursor:'pointer' }}>
                     {faltas > 0 ? faltas : ''}
@@ -1293,7 +1424,7 @@ function RelatoriosScreen() {
           <div style={{ padding:'24px 24px 16px' }}>
             <h3 style={{ fontFamily:'Space Grotesk, sans-serif', fontWeight:600, color:'#e2e8f0', fontSize:15, marginBottom:20 }}>Frequência Mensal — Maio 2026</h3>
             <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={HEATMAP_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={dynamicHeatmap} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <XAxis dataKey="data" tick={{ fill:'rgba(148,163,184,0.5)', fontSize:11 }} axisLine={false} tickLine={false}/>
                 <YAxis tick={{ fill:'rgba(148,163,184,0.5)', fontSize:11 }} axisLine={false} tickLine={false}/>
                 <ReTooltip contentStyle={{ background:'#1a1030', border:'1px solid rgba(139,92,246,0.3)', borderRadius:10, color:'#e2e8f0', fontSize:13 }}/>
@@ -1303,6 +1434,8 @@ function RelatoriosScreen() {
             </ResponsiveContainer>
           </div>
         </div>
+        </>
+        )}
 
         {/* ─── ARCHIVE PANEL ─── */}
         {showArchive && (
